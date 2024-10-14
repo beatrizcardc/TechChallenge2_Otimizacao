@@ -194,7 +194,7 @@ distribuicao_df = pd.DataFrame({
 })
 
 # Função para salvar o DataFrame em um novo CSV
-distribuicao_df.to_csv('/content/Pool_Investimentos_Atualizacao2.csv', index=False)
+distribuicao_df.to_csv('https://raw.githubusercontent.com/beatrizcardc/TechChallenge2_Otimizacao/main/Pool_Investimentos_Atualizacao2.csv', index=False)
 
 # Exibir a distribuição ideal do investimento
 print(distribuicao_df)
