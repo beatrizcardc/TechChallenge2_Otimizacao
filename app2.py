@@ -155,7 +155,7 @@ def selecao_torneio(populacao, fitness_scores, tamanho_torneio=3):
 
 # Exemplo de dados reais para retornos e riscos 
 # Limitar retornos para garantir que não sejam excessivamente elevados
-retornos_reais = np.clip(np.random.rand(34) * 0.2, 0, 0.2)  # Limitar retornos entre 0% e 20%
+retornos_reais = np.clip(np.random.rand(34) * 0.2, 0, 0.4)  # Limitar retornos entre 0% e 40%
 riscos_reais = riscos_completos_final  # Riscos combinados para os 34 ativos
 
 # Rodar o algoritmo genético com o genoma inicial fixo
