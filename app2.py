@@ -17,7 +17,7 @@ taxa_mutacao = st.slider(
 )
 
 # Adicionar controle para selecionar a taxa livre de risco (exemplo: taxa SELIC)
-taxa_livre_risco = st.number_input("Taxa Livre de Risco (Ex: SELIC, POUPANÇA)", value=0.1075
+taxa_livre_risco = st.number_input("Taxa Livre de Risco (Ex: SELIC, POUPANÇA)", value=0.1075,
                                   help="Insira uma taxa que melhor de ajuste aos seus objetivos. A taxa livre de risco padrão no Brasil é a SELIC")
 
 # Pergunta sobre o uso do elitismo (Sim ou Não)
