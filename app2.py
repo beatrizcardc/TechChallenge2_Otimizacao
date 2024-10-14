@@ -103,7 +103,7 @@ def cruzamento(pai1, pai2):
     if len(pontos_corte) % 2 != 0:
         pontos_corte.append(len(pai1))  # Garantir que temos pares de índices
       
-    for i in range(0, len(pontos_corte), - 1, 2):
+    for i in range(0, len(pontos_corte), 2):
         # Realizar a troca entre os segmentos dos pais nos filhos
         filho1[pontos_corte[i]:pontos_corte[i+1]] = pai2[pontos_corte[i]:pontos_corte[i+1]]
         filho2[pontos_corte[i]:pontos_corte[i+1]] = pai1[pontos_corte[i]:pontos_corte[i+1]]
