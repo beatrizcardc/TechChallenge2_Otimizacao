@@ -55,14 +55,22 @@ riscos_completos_final = np.concatenate((riscos_acoes_cripto_dolar.values, risco
 def calcular_sharpe(portfolio, retornos, riscos, taxa_livre_risco):
     retorno_portfolio = np.dot(portfolio, retornos)  # Retorno ponderado
     risco_portfolio = np.sqrt(np.dot(portfolio, riscos ** 2))  # Risco ponderado
-    
-   # Ajustar penalidade: limite superior e inferior para valores do Sharpe Ratio
+
+    # Evitar divisões por zero ou risco muito baixo
+    if risco_portfolio < 0.01:
+        risco_portfolio = 0.01
+
+    # Calcular o Sharpe Ratio
+    sharpe_ratio = (retorno_portfolio - taxa_livre_risco) / risco_portfolio
+
+    # Adicionar limites superiores e inferiores ao Sharpe Ratio para evitar valores irreais
     if sharpe_ratio > 3:
-        sharpe_ratio = 3 + np.log(sharpe_ratio - 1)  # Penalizar Sharpe muito alto
+        sharpe_ratio = 3 + np.log(sharpe_ratio - 2)  # Penaliza Sharpe Ratio muito alto
     elif sharpe_ratio < 0.5:  # Penalizar Sharpe muito baixo
         sharpe_ratio *= 1.5  # Aumentar o valor baixo suavemente
 
     return sharpe_ratio
+
 
 # Função para garantir que não há alocações negativas ou acima de 20%
 def ajustar_alocacao(portfolio):
