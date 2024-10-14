@@ -200,7 +200,7 @@ import requests
 import base64
 # Configurações do GitHub
 repo = "beatrizcardc/TechChallenge2_Otimizacao"
-path = "Pool_Investimentos_Atualizacao2.csv"
+path = "https://github.com/beatrizcardc/TechChallenge2_Otimizacao/blob/main/Pool_Investimentos_Atualizado%20(2).csv"
 token = "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"
 
 # Codificar o arquivo CSV
