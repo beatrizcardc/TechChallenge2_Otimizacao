@@ -94,18 +94,19 @@ def gerar_portfolios_com_genoma_inicial(genoma_inicial, num_portfolios, num_ativ
     return populacao
 
 
-# Função para garantir que não há alocações negativas 
-def ajustar_alocacao(portfolio):
-    portfolio = np.clip(portfolio, 0, 0.2)  # Limitar ativos de menor retorno a 20% OBS
+# Ajustar os limites de alocação para permitir uma maior concentração em ativos de alto retorno
+def ajustar_alocacao(portfolio, limite_max=0.25):
+    # Aumentamos o limite de alocação de 20% para 25%
+    portfolio = np.clip(portfolio, 0, limite_max)  # Limitar entre 0 e 25%
     portfolio /= portfolio.sum()  # Normalizar para garantir que a soma seja 1
     return portfolio
 
-# Função de mutação ajustada para evitar valores negativos 
-def mutacao(portfolio, taxa_mutacao=0.1):  # Aumentar a taxa de mutação para 10%
+# Função de mutação ajustada para permitir maior variabilidade
+def mutacao(portfolio, taxa_mutacao=0.05, limite_max=0.25):
     if np.random.random() < taxa_mutacao:
         i = np.random.randint(0, len(portfolio))
-        portfolio[i] += np.random.uniform(-0.1, 0.1) # Permitir uma variação maior
-        portfolio = ajustar_alocacao(portfolio)  # Garantir que os valores estejam limitados entre 0 e 20% e normalizar
+        portfolio[i] += np.random.uniform(-0.1, 0.1)  # Permitir uma variação maior
+        portfolio = ajustar_alocacao(portfolio, limite_max)  # Garantir que os valores estejam entre 0 e 25% e normalizar
     return portfolio
 
 # Função de Crossover de ponto único ajustada com verificação de índices
@@ -142,7 +143,7 @@ genoma_inicial = np.array([
 assert np.isclose(genoma_inicial.sum(), 1.0), "As alocações devem somar 100% (ou 1.0 em fração)"
 
 # Função para rodar o algoritmo genético com ajustes de penalidade e variabilidade
-def algoritmo_genetico_com_genoma_inicial(retornos, riscos, genoma_inicial, taxa_livre_risco=0.1075, num_portfolios=100, geracoes=130):
+def algoritmo_genetico_com_genoma_inicial(retornos, riscos, genoma_inicial, taxa_livre_risco=0.1075, num_portfolios=100, geracoes=100):
     populacao = gerar_portfolios_com_genoma_inicial(genoma_inicial, num_portfolios, len(retornos))
     melhor_portfolio = genoma_inicial
     melhor_sharpe = calcular_sharpe(genoma_inicial, retornos, riscos, taxa_livre_risco)
