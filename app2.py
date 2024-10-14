@@ -290,16 +290,17 @@ if personalizar_retorno == "Sim":
 num_portfolios = 100  # Defina o número de portfólios
 geracoes = 100  # Defina o número de gerações
     
-    # Executar uma nova busca de portfólio que atenda às metas de retorno
-    melhor_portfolio = None
-    for geracao in range(geracoes):
-        populacao = gerar_portfolios_com_genoma_inicial(genoma_inicial, num_portfolios, len(retornos_usados))
-        for portfolio in populacao:
-            if verificar_retorno(portfolio, retornos_12m, retornos_24m, retornos_36m, metas_retorno):
-                melhor_portfolio = portfolio
-                break
-        if melhor_portfolio:
+# Executar uma nova busca de portfólio que atenda às metas de retorno
+melhor_portfolio = None
+for geracao in range(geracoes):
+    populacao = gerar_portfolios_com_genoma_inicial(genoma_inicial, num_portfolios, len(retornos_usados))
+    for portfolio in populacao:
+        if verificar_retorno(portfolio, retornos_12m, retornos_24m, retornos_36m, metas_retorno):
+            melhor_portfolio = portfolio
             break
+    if melhor_portfolio:
+        break
+
     
     # Caso o algoritmo encontre um portfólio que atenda às metas, exibir os resultados
     if melhor_portfolio:
