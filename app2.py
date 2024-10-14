@@ -3,12 +3,19 @@ import pandas as pd
 import numpy as np
 import yfinance as yf
 import matplotlib.pyplot as plt
-st.title('Otimize seu Portfólio')
+
+# Título da aplicação
+st.title("Otimização de Portfólio")
+
+# Entrada do usuário: valor total do investimento
+valor_total = st.number_input("Digite o valor total do investimento", value=100000)
 
 # Carregar os dados do CSV atualizado (deve conter 34 ativos)
 # Mudando o endereço  para o github usando o raw
 df = pd.read_csv('https://raw.githubusercontent.com/beatrizcardc/TechChallenge2_Otimizacao/main/Pool_Investimentos.csv')
 
+# Exibir o valor total de investimento escolhido
+st.write(f"Você deseja investir: R$ {valor_total}")
 
 # Extrair retornos do CSV para os 34 ativos
 retornos_12m = df['Rentabilidade 12 meses'].values
@@ -194,44 +201,17 @@ distribuicao_df = pd.DataFrame({
 })
 
 # Função para salvar o DataFrame em um novo CSV
-#distribuicao_df.to_csv('https://raw.githubusercontent.com/beatrizcardc/TechChallenge2_Otimizacao/main/Pool_Investimentos_Atualizacao2.csv', index=False)
-# Precisamos da API do Github para salvar diretamente nesse diretório
-import requests
-import base64
-# Configurações do GitHub
-repo = "beatrizcardc/TechChallenge2_Otimizacao"
-path = "https://github.com/beatrizcardc/TechChallenge2_Otimizacao/blob/main/Pool_Investimentos_Atualizado%20(2).csv"
-token = "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"
+# Salvar o DataFrame em um arquivo CSV para download
+csv = df_distribuicao.to_csv(index=False)
 
-# Codificar o arquivo CSV
-with open("Pool_Investimentos_Atualizacao2.csv", "rb") as file:
-    content = file.read()
+# Botão para download do CSV
+st.download_button(label="Baixar CSV Atualizado", data=csv, file_name='Pool_Investimentos_Atualizacao2.csv', mime='text/csv')
 
-content_encoded = base64.b64encode(content).decode("utf-8")
+# Salvar o CSV localmente, para garantir que ele está atualizado para futuros usos
+df_distribuicao.to_csv(csv_file_path, index=False)
 
-# Configurar a URL da API
-url = f"https://api.github.com/repos/{repo}/contents/{path}"
-
-# Configurar o payload para a solicitação
-data = {
-    "message": "Atualizando Pool de Investimentos",
-    "content": content_encoded
-}
-
-# Cabeçalhos de autorização
-headers = {
-    "Authorization": f"token {token}",
-    "Content-Type": "application/json"
-}
-
-# Fazer a solicitação PUT para enviar o arquivo
-response = requests.put(url, json=data, headers=headers)
-
-# Verificar o status da resposta
-if response.status_code == 201:
-    st.write("Arquivo enviado com sucesso para o GitHub!")
-else:
-    st.write(f"Erro ao enviar o arquivo para o GitHub: {response.json()}")
+# Opcional: exibir uma mensagem de sucesso
+st.success("Arquivo CSV atualizado localmente e pronto para download.")
 
 
 
@@ -243,8 +223,10 @@ retorno_12m = np.dot(melhor_portfolio, retornos_12m)
 retorno_24m = np.dot(melhor_portfolio, retornos_24m)
 retorno_36m = np.dot(melhor_portfolio, retornos_36m)
 
-print(f"Melhor portfólio: {melhor_portfolio}")
-print(f"Retorno em 12 meses: {retorno_12m}")
-print(f"Retorno em 24 meses: {retorno_24m}")
-print(f"Retorno em 36 meses: {retorno_36m}")
+
+
+st.write(f"Melhor portfólio: {melhor_portfolio}")
+st.write(f"Retorno em 12 meses: {retorno_12m}")
+st.write(f"Retorno em 24 meses: {retorno_24m}")
+st.write(f"Retorno em 36 meses: {retorno_36m}")
 
