@@ -210,14 +210,14 @@ def algoritmo_genetico_com_genoma_inicial(retornos, riscos, genoma_inicial, taxa
     return melhor_portfolio
     
 # Rodar o algoritmo com os parâmetros selecionados
-melhor_portfolio = algoritmo_genetico_com_genoma_inicial(
-    retornos_reais,  # Usar a variável de retornos correta
-    riscos_completos_final,  # Riscos já estão corretos
-    genoma_inicial,
-    taxa_livre_risco,
-    usar_elitismo=usar_elitismo,
-    taxa_mutacao=taxa_mutacao
-)
+#melhor_portfolio = algoritmo_genetico_com_genoma_inicial(
+    #retornos_reais,  # Usar a variável de retornos correta
+    #riscos_completos_final,  # Riscos já estão corretos
+    #genoma_inicial,
+    #taxa_livre_risco,
+    #usar_elitismo=usar_elitismo,
+    #taxa_mutacao=taxa_mutacao
+#)
 
 # Funções auxiliares: seleção por torneio
 def selecao_torneio(populacao, fitness_scores, tamanho_torneio=3):
