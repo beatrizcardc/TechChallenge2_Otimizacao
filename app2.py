@@ -210,11 +210,13 @@ riscos_reais = riscos_completos_final  # Riscos combinados para os 34 ativos
 # Rodar o algoritmo com os parâmetros selecionados
 melhor_portfolio = algoritmo_genetico_com_genoma_inicial(
     retornos_ajustados,  # Usar a variável de retornos ajustada
-    riscos_completos_final,  # Riscos já estão corretos
-    genoma_inicial,
-    taxa_livre_risco,
-    usar_elitismo=usar_elitismo,
-    taxa_mutacao=taxa_mutacao
+    riscos_completos_final,  # Usar a variável de riscos correta
+    genoma_inicial,  # Genoma inicial
+    taxa_livre_risco,  # Taxa livre de risco
+    num_portfolios=100,  # Número de portfólios
+    geracoes=100,  # Número de gerações
+    usar_elitismo=usar_elitismo,  # Definido pelo usuário
+    taxa_mutacao=taxa_mutacao  # Definido pelo usuário
 )
 
 # Distribuir o valor total de investimento entre os ativos com base na melhor alocação
