@@ -62,6 +62,11 @@ def calcular_sharpe(portfolio, retornos, riscos, taxa_livre_risco):
     retorno_portfolio = np.dot(portfolio, retornos)  # Retorno ponderado
     risco_portfolio = np.sqrt(np.dot(portfolio, riscos ** 2))  # Risco ponderado
 
+    # Penalidade para renda fixa acima de 15%
+    if np.sum(portfolio[:10]) > 0.15:
+        penalidade_renda_fixa = 1 + (np.sum(portfolio[:10]) - 0.15) * 2  # Penalizar de forma agressiva acima de 15%
+        retorno_portfolio /= penalidade_renda_fixa
+
     # Evitar divisões por zero ou risco muito baixo
     if risco_portfolio < 0.01:
         risco_portfolio = 0.01
