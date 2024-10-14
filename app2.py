@@ -198,8 +198,8 @@ def algoritmo_genetico_com_genoma_inicial(retornos, riscos, genoma_inicial, taxa
             nova_populacao.append(mutacao(filho2))
            
         # Inserir o botão de seleção elitismo: garantir que o melhor portfólio da geração anterior permaneça
-        if usar_elitismo == "Sim":
-            nova_populacao[0] = melhor_portfolio
+        if usar_elitismo:
+        nova_populacao[0] = melhor_portfolio  # Garantir que o melhor portfólio da geração anterior permaneça
 
         populacao = nova_populacao
         st.write(f"Geracao {geracao + 1}, Melhor Sharpe Ratio: {melhor_sharpe:.2f}")
