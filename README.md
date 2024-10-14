@@ -48,10 +48,15 @@ EAP - Análise dos Dados
 Algorítimo Genético
 
 População Inicial: Criamos uma população inicial de portfólios, genoma.
+
 Função de Fitness: Avaliaremos cada portfólio usando a relação de Sharpe (retorno vs. risco).
+
 Seleção: Selecionaremos os melhores portfólios com base na função de fitness.
+
 Cruzamento e Mutação: Cruzamos os melhores portfólios para gerar novos e aplicamos mutações.
+
 Critério de Parada: Rodaremos o algoritmo por um número fixo de gerações ou até que não haja mais melhoria significativa.
+
 OBS: Aplicaremos soluções para avaliar e restringir que nenhuma população criada (portfólio) seja inferior ou superior a 100%
 OBS: Aplicaremos o elitismo, para selecionar os melhores portfólios a cada geração.
 OBS: Aplicaremos o Streamlit
