@@ -93,7 +93,7 @@ def gerar_portfolios_com_genoma_inicial(genoma_inicial, num_portfolios, num_ativ
 
 # Função para garantir que não há alocações negativas 
 def ajustar_alocacao(portfolio):
-    portfolio = np.clip(portfolio, 0, 0.05)  # Limitar ativos de menor retorno a 20% OBS
+    portfolio = np.clip(portfolio, 0, 0.2)  # Limitar ativos de menor retorno a 20% OBS
     portfolio /= portfolio.sum()  # Normalizar para garantir que a soma seja 1
     return portfolio
 
