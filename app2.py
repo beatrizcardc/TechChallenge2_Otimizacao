@@ -62,7 +62,7 @@ def calcular_sharpe(portfolio, retornos, riscos, taxa_livre_risco):
     elif sharpe_ratio < 0.5:  # Penalizar Sharpe muito baixo
         sharpe_ratio *= 1.5  # Aumentar o valor baixo suavemente
 
-return sharpe_ratio
+    return sharpe_ratio
 
 # Função para garantir que não há alocações negativas ou acima de 20%
 def ajustar_alocacao(portfolio):
