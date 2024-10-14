@@ -46,7 +46,7 @@ retornos_diarios_completos = dados_historicos_completos.pct_change().dropna()
 riscos_acoes_cripto_dolar = retornos_diarios_completos.std() * np.sqrt(252)  # Riscos anualizados (15 ativos)
 
 # Ajustar riscos para criptomoedas e ativos mais arriscados
-risco_cripto = riscos_acoes_cripto_dolar[10:14] * 1.5  # Ponderar mais para os criptoativos (Bitcoin, Cardano, Ethereum, Litecoin)
+risco_cripto = riscos_acoes_cripto_dolar[10:14] * 1.0  # Ponderar mais para os criptoativos (Bitcoin, Cardano, Ethereum, Litecoin)
 
 # Atualizar os riscos das criptomoedas com o novo valor ponderado
 riscos_acoes_cripto_dolar[10:14] = risco_cripto
@@ -70,9 +70,9 @@ def calcular_sharpe(portfolio, retornos, riscos, taxa_livre_risco):
     sharpe_ratio = (retorno_portfolio - taxa_livre_risco) / risco_portfolio
 
     # Adicionar limites superiores e inferiores ao Sharpe Ratio para evitar valores irreais
-    # Penalidade para Sharpe Ratios irreais (exemplo: se for maior que 10)
-    if sharpe_ratio > 10:
-        penalidade = 1 + (sharpe_ratio - 10) / 2 # Penalizar com um fator menor
+    # Penalidade para Sharpe Ratios irreais (exemplo: se for maior que 5)
+    if sharpe_ratio > 5:
+        penalidade = 1 + (sharpe_ratio - 5) # Penalizar acima de 5
         sharpe_ratio = sharpe_ratio / penalidade
     return sharpe_ratio
 
@@ -84,18 +84,18 @@ def gerar_portfolios_com_genoma_inicial(genoma_inicial, num_portfolios, num_ativ
     return populacao
 
 
-# Função para garantir que não há alocações negativas ou acima de 20%
+# Função para garantir que não há alocações negativas ou acima de 15%
 def ajustar_alocacao(portfolio):
-    portfolio = np.clip(portfolio, 0, 0.2)  # Limitar entre 0 e 20%
+    portfolio = np.clip(portfolio, 0, 0.15)  # Limitar ativos de menor retorno a 15%
     portfolio /= portfolio.sum()  # Normalizar para garantir que a soma seja 1
     return portfolio
 
-# Função de mutação ajustada para evitar valores negativos e respeitar limite de 20%
+# Função de mutação ajustada para evitar valores negativos e respeitar limite de 15%
 def mutacao(portfolio, taxa_mutacao=0.1):  # Aumentar a taxa de mutação para 10%
     if np.random.random() < taxa_mutacao:
         i = np.random.randint(0, len(portfolio))
         portfolio[i] += np.random.uniform(-0.1, 0.1) # Permitir uma variação maior
-        portfolio = ajustar_alocacao(portfolio)  # Garantir que os valores estejam entre 0 e 20% e normalizar
+        portfolio = ajustar_alocacao(portfolio)  # Garantir que os valores estejam entre 0 e 15% e normalizar
     return portfolio
 
 # Função de Crossover de ponto único ajustada com verificação de índices
