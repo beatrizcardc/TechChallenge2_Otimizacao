@@ -22,14 +22,7 @@ usar_elitismo = st.selectbox("Deseja usar elitismo?", options=["Sim", "Não"])
 # Convertendo a resposta para um valor booleano
 usar_elitismo = True if usar_elitismo == "Sim" else False
 
-# Adicionar controle para selecionar qual tipo de retorno usar
-tipo_retorno = st.selectbox("Deseja usar retornos ajustados ou reais?", options=["Ajustados", "Reais"])
 
-# Definir qual conjunto de retornos será utilizado com base na escolha do usuário
-if tipo_retorno == "Ajustados":
-    retornos_usados = retornos_ajustados
-else:
-    retornos_usados = retornos_reais
 
 # Carregar os dados do CSV atualizado diretamente do GitHub
 csv_url = 'https://raw.githubusercontent.com/beatrizcardc/TechChallenge2_Otimizacao/main/Pool_Investimentos.csv'
@@ -71,6 +64,15 @@ risco_cripto = riscos_acoes_cripto_dolar[10:14] * 1.5  # Ponderar mais para os c
 
 # Atualizar os riscos das criptomoedas com o novo valor ponderado
 riscos_acoes_cripto_dolar[10:14] = risco_cripto
+
+# Adicionar controle para selecionar qual tipo de retorno usar
+tipo_retorno = st.selectbox("Deseja usar retornos ajustados ou reais?", options=["Ajustados", "Reais"])
+
+# Definir qual conjunto de retornos será utilizado com base na escolha do usuário
+if tipo_retorno == "Ajustados":
+    retornos_usados = retornos_ajustados
+else:
+    retornos_usados = retornos_reais
 
 # Definir riscos assumidos para os ativos de renda fixa e tesouro (totalizando 19 ativos)
 riscos_fixa_tesouro = np.array([0.05, 0.06, 0.04, 0.03, 0.04, 0.05, 0.05, 0.05, 0.06, 0.04, 0.05, 0.03, 0.04, 0.06, 0.04, 0.05, 0.03, 0.04, 0.03])
