@@ -45,7 +45,7 @@ valor_total = st.number_input("Digite o valor total do investimento", value=1000
 # Adicionar controle para selecionar a taxa de mutação com explicação
 taxa_mutacao = st.slider(
     "Taxa de Mutação",  min_value=0.01, max_value=0.2, value=0.05, step=0.01, 
-    help="A taxa de mutação é um mecanismo essencial para garantir a exploração de novas soluções em algoritmos genéticos, ajudando a balancear exploração (testar soluções novas) e exploração (melhorar soluções existentes)."
+    help="A taxa de mutação é um mecanismo essencial para garantir a exploração de novas soluções em algoritmos genéticos, ajudando a balancear exploração (testar soluções novas) e aproveitamento (melhorar soluções existentes)."
 )
 
 # Adicionar controle para selecionar a taxa livre de risco (exemplo: taxa SELIC)
@@ -293,6 +293,11 @@ st.write(f"Retorno esperado em 36 meses: {retorno_36m:.2f}%")
 
 
 #Inicio de nova opção no código
+
+# Definir os parâmetros iniciais do algoritmo fora do if-else
+geracoes = 100  # Número de gerações
+num_portfolios = 100  # Número de portfólios
+
 
 # Oferecer a opção para o usuário definir metas de retorno personalizadas
 st.write("Deseja buscar um portfólio para atingir uma taxa de retorno personalizada?")
