@@ -70,9 +70,9 @@ def calcular_sharpe(portfolio, retornos, riscos, taxa_livre_risco):
     sharpe_ratio = (retorno_portfolio - taxa_livre_risco) / risco_portfolio
 
     # Adicionar limites superiores e inferiores ao Sharpe Ratio para evitar valores irreais
-    # Penalidade para Sharpe Ratios irreais (exemplo: se for maior que 5)
-    if sharpe_ratio > 5:
-        penalidade = 1 + (sharpe_ratio - 5) # Penalizar acima de 5
+    # Penalidade para Sharpe Ratios irreais (exemplo: se for maior que 3.5)
+    if sharpe_ratio > 3.5:
+        penalidade = 1 + (sharpe_ratio - 3.5) # Penalizar acima de 3.5
         sharpe_ratio = sharpe_ratio / penalidade
     return sharpe_ratio
 
@@ -84,24 +84,24 @@ def gerar_portfolios_com_genoma_inicial(genoma_inicial, num_portfolios, num_ativ
     return populacao
 
 
-# Função para garantir que não há alocações negativas ou acima de 15%
+# Função para garantir que não há alocações negativas 
 def ajustar_alocacao(portfolio):
-    portfolio = np.clip(portfolio, 0, 0.15)  # Limitar ativos de menor retorno a 15%
+    portfolio = np.clip(portfolio, 0, 0.10)  # Limitar ativos de menor retorno a 10%
     portfolio /= portfolio.sum()  # Normalizar para garantir que a soma seja 1
     return portfolio
 
-# Função de mutação ajustada para evitar valores negativos e respeitar limite de 15%
+# Função de mutação ajustada para evitar valores negativos 
 def mutacao(portfolio, taxa_mutacao=0.1):  # Aumentar a taxa de mutação para 10%
     if np.random.random() < taxa_mutacao:
         i = np.random.randint(0, len(portfolio))
         portfolio[i] += np.random.uniform(-0.1, 0.1) # Permitir uma variação maior
-        portfolio = ajustar_alocacao(portfolio)  # Garantir que os valores estejam entre 0 e 15% e normalizar
+        portfolio = ajustar_alocacao(portfolio)  # Garantir que os valores estejam limitados entre 0 e 10% e normalizar
     return portfolio
 
 # Função de Crossover de ponto único ajustada com verificação de índices
 def cruzamento(pai1, pai2):
-    # Vamos variar a quantidade de pontos de corte entre 1 e 3 para mais diversidade Exploration x Explotation
-    num_pontos_corte = np.random.randint(1, 4)  # Gerar de 1 a 3 pontos de corte
+    # Vamos variar a quantidade de pontos de corte entre 1 e 4 para mais diversidade Exploration x Explotation
+    num_pontos_corte = np.random.randint(1, 5)  # Gerar de 1 a 4 pontos de corte
     pontos_corte = sorted(np.random.choice(range(1, len(pai1)), num_pontos_corte, replace=False))
     filho1, filho2 = pai1.copy(), pai2.copy()
 
