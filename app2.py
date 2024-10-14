@@ -5,18 +5,18 @@ st.markdown(
     """
     <style>
     body {
-        background-color: #006400; /* Fundo verde escuro */
-        color: white; /* Texto em branco */
+        background-color: #D3D3D3; /* Fundo cinza claro */
+        color: black; /* Texto em branco */
     }
     
     .stApp {
-        background-color: #006400; /* Fundo verde escuro para toda a aplicação */
-        color: white; /* Texto em branco */
+        background-color: #D3D3D3; /* Fundo cinza claro */
+        color: black; /* Texto em preto */
     }
 
     /* Estilo para os títulos */
     h1, h2, h3, h4, h5, h6 {
-        color: white; /* Títulos em branco */
+        color: black; /* Títulos em preto */
     }
 
     /* Estilo para os botões */
