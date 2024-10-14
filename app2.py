@@ -20,6 +20,9 @@ taxa_livre_risco = st.number_input("Taxa Livre de Risco (Ex: SELIC, POUPANÇA)",
 #usar_elitismo = st.radio("Deseja usar elitismo?", ('Sim', 'Não'))
 usar_elitismo = st.selectbox("Deseja usar elitismo?", options=["Sim", "Não"])
 
+# Convertendo a resposta para um valor booleano
+usar_elitismo = True if usar_elitismo == "Sim" else False
+
 # Carregar os dados do CSV atualizado diretamente do GitHub
 csv_url = 'https://raw.githubusercontent.com/beatrizcardc/TechChallenge2_Otimizacao/main/Pool_Investimentos.csv'
 try:
