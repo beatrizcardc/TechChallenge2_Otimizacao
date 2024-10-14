@@ -62,9 +62,9 @@ def calcular_sharpe(portfolio, retornos, riscos, taxa_livre_risco):
     retorno_portfolio = np.dot(portfolio, retornos)  # Retorno ponderado
     risco_portfolio = np.sqrt(np.dot(portfolio, riscos ** 2))  # Risco ponderado
 
-        # Evitar divisões por zero ou risco muito baixo
-    if risco_portfolio < 0.05:
-        risco_portfolio = 0.05
+        # Evitar divisões por zero ou risco muito baixo  OBS
+    if risco_portfolio < 0.1:
+        risco_portfolio = 0.1
 
     # Calcular o Sharpe Ratio
     sharpe_ratio = (retorno_portfolio - taxa_livre_risco) / risco_portfolio
