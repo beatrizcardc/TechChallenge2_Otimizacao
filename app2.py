@@ -64,9 +64,9 @@ def calcular_sharpe(portfolio, retornos, riscos, taxa_livre_risco):
     sharpe_ratio = (retorno_portfolio - taxa_livre_risco) / risco_portfolio
 
     # Adicionar limites superiores e inferiores ao Sharpe Ratio para evitar valores irreais
-    # Penalidade para Sharpe Ratios irreais (exemplo: se for maior que 7)
-    if sharpe_ratio > 7:
-        penalidade = 1 + (sharpe_ratio - 7) / 2 # Penalizar com um fator menor
+    # Penalidade para Sharpe Ratios irreais (exemplo: se for maior que 10)
+    if sharpe_ratio > 10:
+        penalidade = 1 + (sharpe_ratio - 10) / 2 # Penalizar com um fator menor
         sharpe_ratio = sharpe_ratio / penalidade
     return sharpe_ratio
 
@@ -103,7 +103,7 @@ def cruzamento(pai1, pai2):
     if len(pontos_corte) % 2 != 0:
         pontos_corte.append(len(pai1))  # Garantir que temos pares de índices
       
-    for i in range(0, len(pontos_corte), 2):
+    for i in range(0, len(pontos_corte) - 1, 2):
         # Realizar a troca entre os segmentos dos pais nos filhos
         filho1[pontos_corte[i]:pontos_corte[i+1]] = pai2[pontos_corte[i]:pontos_corte[i+1]]
         filho2[pontos_corte[i]:pontos_corte[i+1]] = pai1[pontos_corte[i]:pontos_corte[i+1]]
