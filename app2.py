@@ -45,6 +45,12 @@ st.write(dados_historicos_completos.isna().sum())
 retornos_diarios_completos = dados_historicos_completos.pct_change().dropna()
 riscos_acoes_cripto_dolar = retornos_diarios_completos.std() * np.sqrt(252)  # Riscos anualizados (15 ativos)
 
+# Ajustar riscos para criptomoedas e ativos mais arriscados
+risco_cripto = riscos_acoes_cripto_dolar[10:14] * 1.5  # Ponderar mais para os criptoativos (Bitcoin, Cardano, Ethereum, Litecoin)
+
+# Atualizar os riscos das criptomoedas com o novo valor ponderado
+riscos_acoes_cripto_dolar[10:14] = risco_cripto
+
 # Definir riscos assumidos para os ativos de renda fixa e tesouro (totalizando 19 ativos)
 riscos_fixa_tesouro = np.array([0.05, 0.06, 0.04, 0.03, 0.04, 0.05, 0.05, 0.05, 0.06, 0.04, 0.05, 0.03, 0.04, 0.06, 0.04, 0.05, 0.03, 0.04, 0.03])
 
@@ -182,7 +188,7 @@ def selecao_torneio(populacao, fitness_scores, tamanho_torneio=3):
 
 # Exemplo de dados reais para retornos e riscos 
 # Limitar retornos para garantir que não sejam excessivamente elevados
-retornos_reais = np.random.rand(34) * 0.2  # Retornos simulados entre 0% e 20%
+retornos_reais = np.random.rand(34) * 0.4  # Retornos simulados entre 0% e 40%
 riscos_reais = riscos_completos_final  # Riscos combinados para os 34 ativos
 
 # Rodar o algoritmo genético com o genoma inicial fixo
