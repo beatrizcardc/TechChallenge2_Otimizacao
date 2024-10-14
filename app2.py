@@ -46,7 +46,7 @@ retornos_diarios_completos = dados_historicos_completos.pct_change().dropna()
 riscos_acoes_cripto_dolar = retornos_diarios_completos.std() * np.sqrt(252)  # Riscos anualizados (15 ativos)
 
 # Ajustar riscos para criptomoedas e ativos mais arriscados
-risco_cripto = riscos_acoes_cripto_dolar[10:14] * 20  # Ponderar mais para os criptoativos (Bitcoin, Cardano, Ethereum, Litecoin)
+risco_cripto = riscos_acoes_cripto_dolar[10:14] * 1.5  # Ponderar mais para os criptoativos (Bitcoin, Cardano, Ethereum, Litecoin)
 
 # Atualizar os riscos das criptomoedas com o novo valor ponderado
 riscos_acoes_cripto_dolar[10:14] = risco_cripto
@@ -63,8 +63,8 @@ def calcular_sharpe(portfolio, retornos, riscos, taxa_livre_risco):
     risco_portfolio = np.sqrt(np.dot(portfolio, riscos ** 2))  # Risco ponderado
 
         # Evitar divisões por zero ou risco muito baixo  OBS
-    if risco_portfolio < 0.005:
-        risco_portfolio = 0.005
+    if risco_portfolio < 0.01:
+        risco_portfolio = 0.01
 
     # Calcular o Sharpe Ratio
     sharpe_ratio = (retorno_portfolio - taxa_livre_risco) / risco_portfolio
@@ -93,7 +93,7 @@ def gerar_portfolios_com_genoma_inicial(genoma_inicial, num_portfolios, num_ativ
 
 # Função para garantir que não há alocações negativas 
 def ajustar_alocacao(portfolio):
-    portfolio = np.clip(portfolio, 0, 0.2)  # Limitar ativos de menor retorno a 20%
+    portfolio = np.clip(portfolio, 0, 0.5)  # Limitar ativos de menor retorno a 20%
     portfolio /= portfolio.sum()  # Normalizar para garantir que a soma seja 1
     return portfolio
 
