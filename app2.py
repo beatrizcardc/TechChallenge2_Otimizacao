@@ -306,62 +306,49 @@ if personalizar_retorno == "Sim":
     taxa_retorno_12m = st.number_input("Meta de retorno em 12 meses (%)", min_value=0.0, value=10.0)
     taxa_retorno_24m = st.number_input("Meta de retorno em 24 meses (%)", min_value=0.0, value=12.0)
     taxa_retorno_36m = st.number_input("Meta de retorno em 36 meses (%)", min_value=0.0, value=15.0)
-    
-    # Função para verificar se o portfólio atende às metas de retorno
-    def verificar_retorno(portfolio, retornos_12m, retornos_24m, retornos_36m, metas):
-        retorno_12m = np.dot(portfolio, retornos_12m)
-        retorno_24m = np.dot(portfolio, retornos_24m)
-        retorno_36m = np.dot(portfolio, retornos_36m)
-        
-        # Verificar se as metas são atingidas
-        if (retorno_12m >= metas[0]) and (retorno_24m >= metas[1]) and (retorno_36m >= metas[2]):
-            return True
-        return False
-    
-    # Definir as metas de retorno
-    metas_retorno = [taxa_retorno_12m, taxa_retorno_24m, taxa_retorno_36m]
 
-# Garantir que as variáveis necessárias estão definidas
-num_portfolios = 100  # Defina o número de portfólios
-geracoes = 100  # Defina o número de gerações
-    
-# Executar uma nova busca de portfólio que atenda às metas de retorno
-melhor_portfolio = None
-for geracao in range(geracoes):
-    populacao = gerar_portfolios_com_genoma_inicial(genoma_inicial, num_portfolios, len(retornos_usados))
-    for portfolio in populacao:
-        if verificar_retorno(portfolio, retornos_12m, retornos_24m, retornos_36m, metas_retorno):
-            melhor_portfolio = portfolio
+    # Definir as metas de retorno com base na entrada do usuário
+    metas_retorno = {
+        '12m': taxa_retorno_12m,
+        '24m': taxa_retorno_24m,
+        '36m': taxa_retorno_36m
+    }
+
+    # Executar a busca por um novo portfólio que atenda às metas
+    melhor_portfolio = None
+    for geracao in range(geracoes):
+        populacao = gerar_portfolios_com_genoma_inicial(genoma_inicial, num_portfolios, len(retornos_usados))
+        for portfolio in populacao:
+            if verificar_retorno(portfolio, retornos_12m, retornos_24m, retornos_36m, metas_retorno):
+                melhor_portfolio = portfolio
+                break
+        if melhor_portfolio:
             break
-    if melhor_portfolio is not None:
-        break
 
-    
     # Caso o algoritmo encontre um portfólio que atenda às metas, exibir os resultados
-if melhor_portfolio is not None:
-    distribuicao_investimento = melhor_portfolio * valor_total
-    distribuicao_df = pd.DataFrame({
-        'Ativo': ativos,
-        'Alocacao (%)': melhor_portfolio * 100,
-        'Valor Investido (R$)': distribuicao_investimento
-    })
+    if melhor_portfolio:
+        distribuicao_investimento = melhor_portfolio * valor_total
+        distribuicao_df = pd.DataFrame({
+            'Ativo': ativos,
+            'Alocacao (%)': melhor_portfolio * 100,
+            'Valor Investido (R$)': distribuicao_investimento
+        })
 
-    st.write("Novo portfólio encontrado para atingir as metas de retorno:")
-    st.dataframe(distribuicao_df.style.format({'Alocacao (%)': '{:.2f}', 'Valor Investido (R$)': '{:.2f}'}))
+        st.write("Novo portfólio encontrado para atingir as metas de retorno:")
+        st.dataframe(distribuicao_df.style.format({'Alocacao (%)': '{:.2f}', 'Valor Investido (R$)': '{:.2f}'}))
 
-    # Calcular os novos retornos com base no portfólio encontrado
-    retorno_12m = np.dot(melhor_portfolio, retornos_12m)
-    retorno_24m = np.dot(melhor_portfolio, retornos_24m)
-    retorno_36m = np.dot(melhor_portfolio, retornos_36m)
+        retorno_12m = np.dot(melhor_portfolio, retornos_12m)
+        retorno_24m = np.dot(melhor_portfolio, retornos_24m)
+        retorno_36m = np.dot(melhor_portfolio, retornos_36m)
 
-    # Exibir os novos retornos esperados no Streamlit
-    st.write(f"Novo retorno esperado em 12 meses: {retorno_12m:.2f}%")
-    st.write(f"Novo retorno esperado em 24 meses: {retorno_24m:.2f}%")
-    st.write(f"Novo retorno esperado em 36 meses: {retorno_36m:.2f}%")
-else:
-    st.write("Não foi encontrado um portfólio que atenda às metas de retorno especificadas.")
+        st.write(f"Novo retorno esperado em 12 meses: {retorno_12m:.2f}%")
+        st.write(f"Novo retorno esperado em 24 meses: {retorno_24m:.2f}%")
+        st.write(f"Novo retorno esperado em 36 meses: {retorno_36m:.2f}%")
+    else:
+        st.write("Não foi encontrado um portfólio que atenda às metas de retorno especificadas.")
 
 # Caso o usuário escolha "Não", manter o portfólio já gerado
 else:
-    st.write("Você optou por não personalizar as metas de retorno. Lembre-se que você pode fazer o download do portfólio atual.")
+    st.write("Você optou por não personalizar as metas de retorno. Mantendo o portfólio atual.")
+
 
