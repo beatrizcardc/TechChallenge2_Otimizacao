@@ -64,9 +64,9 @@ def calcular_sharpe(portfolio, retornos, riscos, taxa_livre_risco):
     sharpe_ratio = (retorno_portfolio - taxa_livre_risco) / risco_portfolio
 
     # Adicionar limites superiores e inferiores ao Sharpe Ratio para evitar valores irreais
-    # Penalidade para Sharpe Ratios irreais (exemplo: se for maior que 5)
-    if sharpe_ratio > 5:
-        penalidade = 1 + (sharpe_ratio - 5) / 2 # Penalizar com um fator menor
+    # Penalidade para Sharpe Ratios irreais (exemplo: se for maior que 7)
+    if sharpe_ratio > 7:
+        penalidade = 1 + (sharpe_ratio - 7) / 2 # Penalizar com um fator menor
         sharpe_ratio = sharpe_ratio / penalidade
     return sharpe_ratio
 
