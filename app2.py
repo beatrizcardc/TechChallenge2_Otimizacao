@@ -30,7 +30,11 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-import pygwalker as pyg
+[theme]
+primaryColor = "#0000FF"
+backgroundColor = "#FFFFFF"
+secondaryBackgroundColor = "#F0F0F0"
+textColor = "#000000"
 
 import streamlit as st
 import pandas as pd
