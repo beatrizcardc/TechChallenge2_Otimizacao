@@ -10,6 +10,16 @@ st.title("Otimização de Portfólio")
 # Entrada do usuário: valor total do investimento
 valor_total = st.number_input("Digite o valor total do investimento", value=100000)
 
+# Adicionar controle para selecionar a taxa de mutação
+taxa_mutacao = st.slider("Taxa de Mutação", min_value=0.01, max_value=0.2, value=0.05, step=0.01)
+
+# Adicionar controle para selecionar a taxa livre de risco (exemplo: taxa SELIC)
+taxa_livre_risco = st.number_input("Taxa Livre de Risco (Ex: SELIC, POUPANÇA)", value=0.1075)
+
+# Pergunta sobre o uso do elitismo (Sim ou Não)
+#usar_elitismo = st.radio("Deseja usar elitismo?", ('Sim', 'Não'))
+usar_elitismo = st.selectbox("Deseja usar elitismo?", options=["Sim", "Não"])
+
 # Carregar os dados do CSV atualizado diretamente do GitHub
 csv_url = 'https://raw.githubusercontent.com/beatrizcardc/TechChallenge2_Otimizacao/main/Pool_Investimentos.csv'
 try:
@@ -57,8 +67,6 @@ riscos_fixa_tesouro = np.array([0.05, 0.06, 0.04, 0.03, 0.04, 0.05, 0.05, 0.05, 
 # Combinar os riscos de ações, criptomoedas e renda fixa/tesouro para totalizar 34 ativos
 riscos_completos_final = np.concatenate((riscos_acoes_cripto_dolar.values, riscos_fixa_tesouro))
 
-# Pergunta sobre o uso do elitismo (Sim ou Não)
-usar_elitismo = st.radio("Deseja usar elitismo?", ('Sim', 'Não'))
 
 # Função para calcular o Sharpe Ratio com penalização e normalização
 def calcular_sharpe(portfolio, retornos, riscos, taxa_livre_risco):
@@ -102,11 +110,19 @@ def ajustar_alocacao(portfolio, limite_max=0.25):
     return portfolio
 
 # Função de mutação ajustada para permitir maior variabilidade
-def mutacao(portfolio, taxa_mutacao=0.05, limite_max=0.25):
+#def mutacao(portfolio, taxa_mutacao=0.05, limite_max=0.25):
+    #if np.random.random() < taxa_mutacao:
+       # i = np.random.randint(0, len(portfolio))
+       # portfolio[i] += np.random.uniform(-0.1, 0.1)  # Permitir uma variação maior
+       # portfolio = ajustar_alocacao(portfolio, limite_max)  # Garantir que os valores estejam entre 0 e 25% e normalizar
+   # return portfolio
+
+# Função de mutação com taxa ajustável
+def mutacao(portfolio, taxa_mutacao, limite_max=0.25):
     if np.random.random() < taxa_mutacao:
         i = np.random.randint(0, len(portfolio))
-        portfolio[i] += np.random.uniform(-0.1, 0.1)  # Permitir uma variação maior
-        portfolio = ajustar_alocacao(portfolio, limite_max)  # Garantir que os valores estejam entre 0 e 25% e normalizar
+        portfolio[i] += np.random.uniform(-0.1, 0.1)
+        portfolio = ajustar_alocacao(portfolio, limite_max)
     return portfolio
 
 # Função de Crossover de ponto único ajustada com verificação de índices
@@ -179,7 +195,7 @@ def algoritmo_genetico_com_genoma_inicial(retornos, riscos, genoma_inicial, taxa
             nova_populacao.append(mutacao(filho2))
            
         # Inserir o botão de seleção elitismo: garantir que o melhor portfólio da geração anterior permaneça
-        if usar_elitismo:
+        if usar_elitismo == "Sim":
             nova_populacao[0] = melhor_portfolio
 
         populacao = nova_populacao
@@ -192,6 +208,9 @@ def algoritmo_genetico_com_genoma_inicial(retornos, riscos, genoma_inicial, taxa
         st.write(f"Geracao {geracao + 1}, Melhor Sharpe Ratio: {melhor_sharpe}")
 
     return melhor_portfolio
+    
+    # Rodar o algoritmo com os parâmetros selecionados
+        melhor_portfolio = algoritmo_genetico_com_genoma_inicial(retornos_completos_final, riscos_completos_final, genoma_inicial, taxa_livre_risco, usar_elitismo=usar_elitismo, taxa_mutacao=taxa_mutacao)
 
 # Funções auxiliares: seleção por torneio
 def selecao_torneio(populacao, fitness_scores, tamanho_torneio=3):
