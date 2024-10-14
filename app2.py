@@ -92,14 +92,19 @@ def mutacao(portfolio, taxa_mutacao=0.05):  # Aumentar a taxa de mutação de 0.
         portfolio = ajustar_alocacao(portfolio)  # Garantir que os valores estejam entre 0 e 20% e normalizar
     return portfolio
 
-# Função de cruzamento de ponto único ajustada
+# Função de Crossover de ponto único ajustada com verificação de índices
 def cruzamento(pai1, pai2):
     # Vamos variar a quantidade de pontos de corte entre 1 e 3 para mais diversidade Exploration x Explotation
-    num_pontos_corte = np.random.randint(1, 4)  
+    num_pontos_corte = np.random.randint(1, 4)  # Gerar de 1 a 3 pontos de corte
     pontos_corte = sorted(np.random.choice(range(1, len(pai1)), num_pontos_corte, replace=False))
     filho1, filho2 = pai1.copy(), pai2.copy()
 
-    for i in range(0, len(pontos_corte), 2):
+    # Verificar se o número de pontos de corte é válido
+    if len(pontos_corte) % 2 != 0:
+        pontos_corte.append(len(pai1))  # Garantir que temos pares de índices
+      
+    for i in range(0, len(pontos_corte), - 1, 2):
+        # Realizar a troca entre os segmentos dos pais nos filhos
         filho1[pontos_corte[i]:pontos_corte[i+1]] = pai2[pontos_corte[i]:pontos_corte[i+1]]
         filho2[pontos_corte[i]:pontos_corte[i+1]] = pai1[pontos_corte[i]:pontos_corte[i+1]]
 
