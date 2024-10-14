@@ -104,8 +104,8 @@ def cruzamento(pai1, pai2):
         filho2[pontos_corte[i]:pontos_corte[i+1]] = pai1[pontos_corte[i]:pontos_corte[i+1]]
 
     # Ajustar e normalizar os filhos
-    filho1 = ajustar_alocacao(filho1)
-    filho2 = ajustar_alocacao(filho2)
+    filho1 = ajustar_alocacao(filho1) # Limitar a alocação por ativo e normalizar
+    filho2 = ajustar_alocacao(filho2) # Limitar a alocação por ativo e normalizar
 
     return filho1, filho2
 
@@ -148,6 +148,11 @@ def algoritmo_genetico_com_genoma_inicial(retornos, riscos, genoma_inicial, taxa
         for i in range(0, len(populacao), 2):
             pai1, pai2 = populacao[i], populacao[i+1]
             filho1, filho2 = cruzamento(pai1, pai2)
+
+            # Garantir que os filhos estejam dentro dos limites
+            filho1 = ajustar_alocacao(filho1)  # Limitar a alocação por ativo e normalizar
+            filho2 = ajustar_alocacao(filho2)  # Limitar a alocação por ativo e normalizar
+            
             nova_populacao.append(mutacao(filho1))
             nova_populacao.append(mutacao(filho2))
            
