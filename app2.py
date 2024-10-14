@@ -298,7 +298,6 @@ st.write(f"Retorno esperado em 36 meses: {retorno_36m:.2f}%")
 geracoes = 100  # Número de gerações
 num_portfolios = 100  # Número de portfólios
 
-
 # Oferecer a opção para o usuário definir metas de retorno personalizadas
 st.write("Deseja buscar um portfólio para atingir uma taxa de retorno personalizada?")
 personalizar_retorno = st.selectbox("Personalizar taxa de retorno?", options=["Não", "Sim"])
@@ -352,5 +351,11 @@ if personalizar_retorno == "Sim":
 # Caso o usuário escolha "Não", manter o portfólio já gerado
 else:
     st.write("Você optou por não personalizar as metas de retorno. Mantendo o portfólio atual.")
+    # Mostrar o portfólio já gerado, caso tenha sido criado anteriormente
+    if 'distribuicao_df' in locals():
+        st.dataframe(distribuicao_df.style.format({'Alocacao (%)': '{:.2f}', 'Valor Investido (R$)': '{:.2f}'}))
+    else:
+        st.write("Não há portfólio gerado para exibir.")
+
 
 
