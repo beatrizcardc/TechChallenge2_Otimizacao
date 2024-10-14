@@ -5,7 +5,7 @@ import yfinance as yf
 import matplotlib.pyplot as plt
 
 # Título da aplicação
-st.title("Otimização de Portfólio")
+st.title("Otimização de Investimentos - Garanta sua Aposentadoria")
 
 # Entrada do usuário: valor total do investimento
 valor_total = st.number_input("Digite o valor total do investimento", value=100000)
@@ -17,7 +17,8 @@ taxa_mutacao = st.slider(
 )
 
 # Adicionar controle para selecionar a taxa livre de risco (exemplo: taxa SELIC)
-taxa_livre_risco = st.number_input("Taxa Livre de Risco (Ex: SELIC, POUPANÇA)", value=0.1075)
+taxa_livre_risco = st.number_input("Taxa Livre de Risco (Ex: SELIC, POUPANÇA)", value=0.1075
+                                  help="Insira uma taxa que melhor de ajuste aos seus objetivos. A taxa livre de risco padrão no Brasil é a SELIC")
 
 # Pergunta sobre o uso do elitismo (Sim ou Não)
 usar_elitismo = st.selectbox("Deseja usar elitismo?", options=["Sim", "Não"])
