@@ -5,7 +5,7 @@ import yfinance as yf
 import matplotlib.pyplot as plt
 
 # Título da aplicação
-st.title("Otimização de Investimentos - Garanta sua Aposentadoria")
+st.title("Otimização de Investimentos - Realize seus Objetivos")
 
 # Entrada do usuário: valor total do investimento
 valor_total = st.number_input("Digite o valor total do investimento", value=100000)
@@ -260,5 +260,63 @@ st.write(f"Retorno esperado em 24 meses: {retorno_24m:.2f}%")
 st.write(f"Retorno esperado em 36 meses: {retorno_36m:.2f}%")
 
 
+#Inicio de nova opção no código
+
+# Oferecer a opção para o usuário definir metas de retorno personalizadas
+st.write("Deseja buscar um portfólio para atingir uma taxa de retorno personalizada?")
+personalizar_retorno = st.selectbox("Personalizar taxa de retorno?", options=["Não", "Sim"])
+
+# Se o usuário escolher 'Sim', permitir a entrada de metas de retorno para 12, 24 e 36 meses
+if personalizar_retorno == "Sim":
+    taxa_retorno_12m = st.number_input("Meta de retorno em 12 meses (%)", min_value=0.0, value=10.0)
+    taxa_retorno_24m = st.number_input("Meta de retorno em 24 meses (%)", min_value=0.0, value=12.0)
+    taxa_retorno_36m = st.number_input("Meta de retorno em 36 meses (%)", min_value=0.0, value=15.0)
+    
+    # Função para verificar se o portfólio atende às metas de retorno
+    def verificar_retorno(portfolio, retornos_12m, retornos_24m, retornos_36m, metas):
+        retorno_12m = np.dot(portfolio, retornos_12m)
+        retorno_24m = np.dot(portfolio, retornos_24m)
+        retorno_36m = np.dot(portfolio, retornos_36m)
+        
+        # Verificar se as metas são atingidas
+        if (retorno_12m >= metas[0]) and (retorno_24m >= metas[1]) and (retorno_36m >= metas[2]):
+            return True
+        return False
+    
+    # Definir as metas de retorno
+    metas_retorno = [taxa_retorno_12m, taxa_retorno_24m, taxa_retorno_36m]
+    
+    # Executar uma nova busca de portfólio que atenda às metas de retorno
+    melhor_portfolio = None
+    for geracao in range(geracoes):
+        populacao = gerar_portfolios_com_genoma_inicial(genoma_inicial, num_portfolios, len(retornos_usados))
+        for portfolio in populacao:
+            if verificar_retorno(portfolio, retornos_12m, retornos_24m, retornos_36m, metas_retorno):
+                melhor_portfolio = portfolio
+                break
+        if melhor_portfolio:
+            break
+    
+    # Caso o algoritmo encontre um portfólio que atenda às metas, exibir os resultados
+    if melhor_portfolio:
+        distribuicao_investimento = melhor_portfolio * valor_total
+        distribuicao_df = pd.DataFrame({
+            'Ativo': ativos,
+            'Alocacao (%)': melhor_portfolio * 100,
+            'Valor Investido (R$)': distribuicao_investimento
+        })
+        
+        st.write("Novo portfólio encontrado para atingir as metas de retorno:")
+        st.dataframe(distribuicao_df.style.format({'Alocacao (%)': '{:.2f}', 'Valor Investido (R$)': '{:.2f}'}))
+        
+        retorno_12m = np.dot(melhor_portfolio, retornos_12m)
+        retorno_24m = np.dot(melhor_portfolio, retornos_24m)
+        retorno_36m = np.dot(melhor_portfolio, retornos_36m)
+        
+        st.write(f"Novo retorno esperado em 12 meses: {retorno_12m:.2f}%")
+        st.write(f"Novo retorno esperado em 24 meses: {retorno_24m:.2f}%")
+        st.write(f"Novo retorno esperado em 36 meses: {retorno_36m:.2f}%")
+    else:
+        st.write("Não foi encontrado um portfólio que atenda às metas de retorno especificadas.")
 
 
