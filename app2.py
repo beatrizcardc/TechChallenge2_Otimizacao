@@ -10,9 +10,13 @@ st.title("Otimização de Portfólio")
 # Entrada do usuário: valor total do investimento
 valor_total = st.number_input("Digite o valor total do investimento", value=100000)
 
-# Carregar os dados do CSV atualizado (deve conter 34 ativos)
-# Mudando o endereço  para o github usando o raw
-df = pd.read_csv('https://raw.githubusercontent.com/beatrizcardc/TechChallenge2_Otimizacao/main/Pool_Investimentos.csv')
+# Carregar os dados do CSV atualizado diretamente do GitHub
+csv_url = 'https://raw.githubusercontent.com/beatrizcardc/TechChallenge2_Otimizacao/main/Pool_Investimentos.csv'
+try:
+    df = pd.read_csv(csv_url)
+except Exception as e:
+    st.error(f"Erro ao carregar o CSV: {e}")
+    st.stop()
 
 # Exibir o valor total de investimento escolhido
 st.write(f"Você deseja investir: R$ {valor_total}")
@@ -34,8 +38,8 @@ dados_historicos_completos = yf.download(tickers_acoes_cripto_dolar, start='2021
 dados_historicos_completos.fillna(dados_historicos_completos.mean(), inplace=True)
 
 # Verificar se ainda existem valores NaN
-print("Verificando valores NaN após preenchimento:")
-print(dados_historicos_completos.isna().sum())
+st.write("Verificando valores NaN após preenchimento:")
+st.write(dados_historicos_completos.isna().sum())
 
 # Calcular os retornos diários e o desvio padrão (volatilidade) anualizado para as 15 ações, criptos e dólar
 retornos_diarios_completos = dados_historicos_completos.pct_change().dropna()
@@ -82,55 +86,21 @@ def cruzamento(pai1, pai2):
 
 # Função para gerar o genoma inicial de portfólios com 34 ativos
 genoma_inicial = np.array([
-    0.00,  # Tesouro Prefixado (sem alocação)
-    0.00,  # Tesouro RendA (sem alocação)
-    0.20,  # Tesouro Selic (20% do portfólio)
-    0.00,  # Tesouro IPCA (sem alocação)
-    0.05,  # Bitcoin (5% do portfólio)
-    0.00,  # Cardano (sem alocação)
-    0.03,  # Ethereum (5% do portfólio)
-    0.00,  # Litecoin (sem alocação)
-    0.00,  # Dólar (sem alocação)
-    0.03,  # VALE3.SA (5% do portfólio)
-    0.05,  # PETR4.SA (5% do portfólio)
-    0.00,  # JBSS3.SA (sem alocação)
-    0.00,  # MGLU3.SA (sem alocação)
-    0.00,  # RENT3.SA (sem alocação)
-    0.00,  # B3SA3.SA (sem alocação)
-    0.00,  # WEGE3.SA (sem alocação)
-    0.00,  # EMBR3.SA (sem alocação)
-    0.05,  # GOLL4.SA (5% do portfólio)
-    0.05,  # ITUB4.SA (5% do portfólio)
-    0.06,  # Renda Fixa BB 1 (10% do portfólio)
-    0.10,  # Renda Fixa BB 2 (10% do portfólio)
-    0.00,  # Renda Fixa BB 3 (sem alocação)
-    0.00,  # Renda Fixa BB 4 (sem alocação)
-    0.00,  # Renda Fixa BB 5 (sem alocação)
-    0.05,  # Renda Fixa Bradesco 1 (5% do portfólio)
-    0.05,  # Renda Fixa Bradesco 2 (5% do portfólio)
-    0.05,  # Renda Fixa Bradesco 3 (5% do portfólio)
-    0.05,  # Renda Fixa Bradesco 4 (5% do portfólio)
-    0.00,  # Renda Fixa Bradesco 5 (sem alocação)
-    0.05,  # Renda Fixa Itaú 1 (5% do portfólio)
-    0.05,  # Renda Fixa Itaú 2 (5% do portfólio)
-    0.03,  # Renda Fixa Itaú 3 (5% do portfólio)
-    0.05,  # Renda Fixa Itaú 4 (5% do portfólio)
-    0.00   # Renda Fixa Itaú 5 (sem alocação)
+    0.00, 0.00, 0.20, 0.00, 0.05, 0.00, 0.03, 0.00, 0.00, 0.03,
+    0.05, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.05, 0.05, 0.06,
+    0.10, 0.00, 0.00, 0.00, 0.05, 0.05, 0.05, 0.05, 0.00, 0.05,
+    0.05, 0.03, 0.05, 0.00
 ])
 
 # Verificando se a soma das alocações é 100%
 assert np.isclose(genoma_inicial.sum(), 1.0), "As alocações devem somar 100% (ou 1.0 em fração)"
 
-# Função para gerar a população inicial com o genoma inicial fixo
-def gerar_portfolios_com_genoma_inicial(genoma_inicial, num_portfolios, num_ativos):
-    populacao = [genoma_inicial]  # Começar com o genoma inicial fixo
-    for _ in range(num_portfolios - 1):  # Gerar o restante aleatoriamente
-        populacao.append(np.random.dirichlet(np.ones(num_ativos)))
-    return populacao
-
 # Função para rodar o algoritmo genético com genoma inicial fixo
 def algoritmo_genetico_com_genoma_inicial(retornos, riscos, genoma_inicial, taxa_livre_risco=0.1075, num_portfolios=100, geracoes=100):
-    populacao = gerar_portfolios_com_genoma_inicial(genoma_inicial, num_portfolios, len(retornos))
+    populacao = [genoma_inicial]
+    for _ in range(num_portfolios - 1):
+        populacao.append(np.random.dirichlet(np.ones(len(genoma_inicial))))
+    
     melhor_portfolio = genoma_inicial
     melhor_sharpe = calcular_sharpe(genoma_inicial, retornos, riscos, taxa_livre_risco)
 
@@ -138,41 +108,31 @@ def algoritmo_genetico_com_genoma_inicial(retornos, riscos, genoma_inicial, taxa
         # Calcular o Sharpe Ratio (fitness) para cada portfólio
         fitness_scores = np.array([calcular_sharpe(port, retornos, riscos, taxa_livre_risco) for port in populacao])
 
-        # Verificar se algum portfólio é inválido (alocação fora do intervalo permitido)
-        for portfolio in populacao:
-            assert np.isclose(portfolio.sum(), 1.0), "Portfólio inválido: soma das alocações não é 100%"
-
         # Identificar o melhor portfólio
         indice_melhor_portfolio = np.argmax(fitness_scores)
         if fitness_scores[indice_melhor_portfolio] > melhor_sharpe:
             melhor_sharpe = fitness_scores[indice_melhor_portfolio]
             melhor_portfolio = populacao[indice_melhor_portfolio]
 
-        # Seleção e cruzamento (crossover) e mutação
+        # Seleção, cruzamento e mutação
         populacao = selecao_torneio(populacao, fitness_scores)
         nova_populacao = []
         for i in range(0, len(populacao), 2):
             pai1, pai2 = populacao[i], populacao[i+1]
             filho1, filho2 = cruzamento(pai1, pai2)
-
-            # Garantir que os filhos estejam dentro dos limites
-            filho1 = ajustar_alocacao(filho1)  # Limitar a alocação por ativo e normalizar
-            filho2 = ajustar_alocacao(filho2)  # Limitar a alocação por ativo e normalizar
-
             nova_populacao.append(mutacao(filho1))
             nova_populacao.append(mutacao(filho2))
-
-        # Inserir o elitismo: garantir que o melhor portfólio da geração anterior permaneça
+           # Inserir o elitismo: garantir que o melhor portfólio da geração anterior permaneça
         nova_populacao[0] = melhor_portfolio
 
         populacao = nova_populacao
 
-        # Exibir o melhor Sharpe Ratio da geração atual
-        print(f"Geracao {geracao + 1}, Melhor Sharpe Ratio: {melhor_sharpe}")
+        # Exibir o melhor Sharpe Ratio da geração atual no Streamlit
+        st.write(f"Geracao {geracao + 1}, Melhor Sharpe Ratio: {melhor_sharpe}")
 
     return melhor_portfolio
 
-# Funções auxiliares: seleção por torneio, cruzamento e mutação
+# Funções auxiliares: seleção por torneio
 def selecao_torneio(populacao, fitness_scores, tamanho_torneio=3):
     selecionados = []
     for _ in range(len(populacao)):
@@ -181,18 +141,18 @@ def selecao_torneio(populacao, fitness_scores, tamanho_torneio=3):
         selecionados.append(populacao[vencedor])
     return selecionados
 
-# Exemplo de dados reais para retornos e riscos
-retornos_reais = np.random.rand(34) * 0.2  # Retornos simulados entre 0 e 20%
-riscos_reais = np.random.rand(34) * 0.1    # Riscos simulados entre 0 e 10%
+# Exemplo de dados reais para retornos e riscos (substitua pelos dados reais do seu projeto)
+retornos_reais = retornos_12m  # Retornos de 12 meses para o exemplo
+riscos_reais = riscos_completos_final  # Riscos combinados para os 34 ativos
 
 # Rodar o algoritmo genético com o genoma inicial fixo
 melhor_portfolio = algoritmo_genetico_com_genoma_inicial(retornos_reais, riscos_reais, genoma_inicial)
 
-# Distribuir 100 mil reais entre os ativos com base na melhor alocação
-total_investido = 100000  # 100 mil reais
+# Distribuir o valor total de investimento entre os ativos com base na melhor alocação
+total_investido = valor_total  # Usando o valor definido pelo usuário no Streamlit
 distribuicao_investimento = melhor_portfolio * total_investido
 
-# Criar um DataFrame para exibir a distribuição
+# Criar um DataFrame para exibir a distribuição de investimento
 ativos = df['Ativo'].values  # Lista dos ativos
 distribuicao_df = pd.DataFrame({
     'Ativo': ativos,
@@ -200,33 +160,23 @@ distribuicao_df = pd.DataFrame({
     'Valor Investido (R$)': distribuicao_investimento
 })
 
-# Função para salvar o DataFrame em um novo CSV
-# Salvar o DataFrame em um arquivo CSV para download
-csv = df_distribuicao.to_csv(index=False)
+# Exibir a distribuição ideal do investimento no Streamlit
+st.write("Distribuição ideal de investimento:")
+st.dataframe(distribuicao_df.style.format({'Alocacao (%)': '{:.2f}', 'Valor Investido (R$)': '{:.2f}'}))
 
-# Botão para download do CSV
+# Função para salvar o DataFrame em um novo CSV para download
+csv = distribuicao_df.to_csv(index=False)
+
+# Botão para download do CSV atualizado
 st.download_button(label="Baixar CSV Atualizado", data=csv, file_name='Pool_Investimentos_Atualizacao2.csv', mime='text/csv')
 
-# Salvar o CSV localmente, para garantir que ele está atualizado para futuros usos
-df_distribuicao.to_csv(csv_file_path, index=False)
-
-# Opcional: exibir uma mensagem de sucesso
-st.success("Arquivo CSV atualizado localmente e pronto para download.")
-
-
-
-# Exibir a distribuição ideal do investimento
-print(distribuicao_df)
-
-# Calcular os retornos com base nas alocações
+# Calcular os retornos esperados com base nas alocações
 retorno_12m = np.dot(melhor_portfolio, retornos_12m)
 retorno_24m = np.dot(melhor_portfolio, retornos_24m)
 retorno_36m = np.dot(melhor_portfolio, retornos_36m)
 
-
-
-st.write(f"Melhor portfólio: {melhor_portfolio}")
-st.write(f"Retorno em 12 meses: {retorno_12m}")
-st.write(f"Retorno em 24 meses: {retorno_24m}")
-st.write(f"Retorno em 36 meses: {retorno_36m}")
+# Exibir os retornos esperados no Streamlit
+st.write(f"Retorno esperado em 12 meses: {retorno_12m:.2f}%")
+st.write(f"Retorno esperado em 24 meses: {retorno_24m:.2f}%")
+st.write(f"Retorno esperado em 36 meses: {retorno_36m:.2f}%")
 
