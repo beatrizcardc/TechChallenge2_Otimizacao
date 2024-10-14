@@ -3,7 +3,7 @@ import pandas as pd
 import numpy as np
 import yfinance as yf
 import matplotlib.pyplot as plt
-st.title('% Otimize seu Portfólio')
+st.title('Otimize seu Portfólio')
 
 # Carregar os dados do CSV atualizado (deve conter 34 ativos)
 df = pd.read_csv('/content/Pool_Investimentos.csv')
