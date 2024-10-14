@@ -350,7 +350,7 @@ if personalizar_retorno == "Sim":
             if verificar_retorno(portfolio, retornos_12m, retornos_24m, retornos_36m, metas_retorno):
                 melhor_portfolio = portfolio
                 break
-        if melhor_portfolio:
+        if melhor_portfolio:is not None:  # Verificar se algum portfólio foi encontrado
             break
 
     # Caso o algoritmo encontre um portfólio que atenda às metas, exibir os resultados
