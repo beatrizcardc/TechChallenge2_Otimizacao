@@ -51,11 +51,21 @@ riscos_fixa_tesouro = np.array([0.05, 0.06, 0.04, 0.03, 0.04, 0.05, 0.05, 0.05, 
 # Combinar os riscos de ações, criptomoedas e renda fixa/tesouro para totalizar 34 ativos
 riscos_completos_final = np.concatenate((riscos_acoes_cripto_dolar.values, riscos_fixa_tesouro))
 
-# Função para calcular o Sharpe Ratio
+# Função para calcular o Sharpe Ratio (fitness) com limitação
 def calcular_sharpe(portfolio, retornos, riscos, taxa_livre_risco):
     retorno_portfolio = np.dot(portfolio, retornos)  # Retorno ponderado
     risco_portfolio = np.sqrt(np.dot(portfolio, riscos ** 2))  # Risco ponderado
+    
+    # Se o risco for muito baixo, adicione uma pequena penalidade para evitar divisões por zero
+    if risco_portfolio < 0.0001:
+        risco_portfolio = 0.0001
+
     sharpe_ratio = (retorno_portfolio - taxa_livre_risco) / risco_portfolio
+
+    # Penalidade para Sharpe Ratios muito altos
+    if sharpe_ratio > 3.5:
+        sharpe_ratio = 3.5 + np.log(sharpe_ratio - 3)
+
     return sharpe_ratio
 
 # Função para garantir que não há alocações negativas ou acima de 20%
