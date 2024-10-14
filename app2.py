@@ -10,8 +10,11 @@ st.title("Otimização de Portfólio")
 # Entrada do usuário: valor total do investimento
 valor_total = st.number_input("Digite o valor total do investimento", value=100000)
 
-# Adicionar controle para selecionar a taxa de mutação
-taxa_mutacao = st.slider("Taxa de Mutação", min_value=0.01, max_value=0.2, value=0.05, step=0.01)
+# Adicionar controle para selecionar a taxa de mutação com explicação
+taxa_mutacao = st.slider(
+    "Taxa de Mutação",  min_value=0.01, max_value=0.2, value=0.05, step=0.01, 
+    help="A taxa de mutação é um mecanismo essencial para garantir a exploração de novas soluções em algoritmos genéticos, ajudando a balancear exploração (testar soluções novas) e exploração (melhorar soluções existentes)."
+)
 
 # Adicionar controle para selecionar a taxa livre de risco (exemplo: taxa SELIC)
 taxa_livre_risco = st.number_input("Taxa Livre de Risco (Ex: SELIC, POUPANÇA)", value=0.1075)
