@@ -361,5 +361,7 @@ if melhor_portfolio is not None:
 else:
     st.write("Não foi encontrado um portfólio que atenda às metas de retorno especificadas.")
 
-
+# Caso o usuário escolha "Não", manter o portfólio já gerado
+else:
+    st.write("Você optou por não personalizar as metas de retorno. Lembre-se que você pode fazer o download do portfólio atual.")
 
