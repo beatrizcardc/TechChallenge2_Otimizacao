@@ -245,7 +245,7 @@ riscos_reais = riscos_completos_final  # Riscos combinados para os 34 ativos
 
 # Rodar o algoritmo com os parâmetros selecionados
 melhor_portfolio = algoritmo_genetico_com_genoma_inicial(
-    retornos_ajustados,  # Usar a variável de retornos correta
+     retornos_reais,  # Usar a variável de retornos correta
     riscos_completos_final,  # Riscos já estão corretos
     genoma_inicial,
     taxa_livre_risco,
