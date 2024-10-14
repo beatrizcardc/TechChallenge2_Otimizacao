@@ -294,6 +294,33 @@ st.write(f"Retorno esperado em 36 meses: {retorno_36m:.2f}%")
 
 #Inicio de nova opção no código
 
+# Definir a função verificar_retorno para comparar os retornos do portfólio com as metas definidas
+def verificar_retorno(portfolio, retornos_12m, retornos_24m, retornos_36m, metas_retorno):
+    """
+    Verifica se os retornos esperados do portfólio atendem às metas de retorno definidas pelo usuário.
+    
+    Args:
+        portfolio (np.array): Alocações do portfólio.
+        retornos_12m (np.array): Retornos esperados em 12 meses para cada ativo.
+        retornos_24m (np.array): Retornos esperados em 24 meses para cada ativo.
+        retornos_36m (np.array): Retornos esperados em 36 meses para cada ativo.
+        metas_retorno (dict): Metas de retorno para 12, 24 e 36 meses definidas pelo usuário.
+    
+    Returns:
+        bool: True se o portfólio atender às metas de retorno, False caso contrário.
+    """
+    # Calcular os retornos ponderados do portfólio para 12, 24 e 36 meses
+    retorno_portfolio_12m = np.dot(portfolio, retornos_12m)
+    retorno_portfolio_24m = np.dot(portfolio, retornos_24m)
+    retorno_portfolio_36m = np.dot(portfolio, retornos_36m)
+    
+    # Verificar se os retornos do portfólio atendem às metas
+    if (retorno_portfolio_12m >= metas_retorno['12m'] and
+        retorno_portfolio_24m >= metas_retorno['24m'] and
+        retorno_portfolio_36m >= metas_retorno['36m']):
+        return True
+    return False
+
 # Definir os parâmetros iniciais do algoritmo fora do if-else
 geracoes = 100  # Número de gerações
 num_portfolios = 100  # Número de portfólios
@@ -356,6 +383,7 @@ else:
         st.dataframe(distribuicao_df.style.format({'Alocacao (%)': '{:.2f}', 'Valor Investido (R$)': '{:.2f}'}))
     else:
         st.write("Não há portfólio gerado para exibir.")
+
 
 
 
