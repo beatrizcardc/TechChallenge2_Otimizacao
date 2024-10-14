@@ -194,7 +194,46 @@ distribuicao_df = pd.DataFrame({
 })
 
 # Função para salvar o DataFrame em um novo CSV
-distribuicao_df.to_csv('https://raw.githubusercontent.com/beatrizcardc/TechChallenge2_Otimizacao/main/Pool_Investimentos_Atualizacao2.csv', index=False)
+#distribuicao_df.to_csv('https://raw.githubusercontent.com/beatrizcardc/TechChallenge2_Otimizacao/main/Pool_Investimentos_Atualizacao2.csv', index=False)
+# Precisamos da API do Github para salvar diretamente nesse diretório
+import requests
+import base64
+# Configurações do GitHub
+repo = "beatrizcardc/TechChallenge2_Otimizacao"
+path = "Pool_Investimentos_Atualizacao2.csv"
+token = "YOUR_GITHUB_PERSONAL_ACCESS_TOKEN"
+
+# Codificar o arquivo CSV
+with open("Pool_Investimentos_Atualizacao2.csv", "rb") as file:
+    content = file.read()
+
+content_encoded = base64.b64encode(content).decode("utf-8")
+
+# Configurar a URL da API
+url = f"https://api.github.com/repos/{repo}/contents/{path}"
+
+# Configurar o payload para a solicitação
+data = {
+    "message": "Atualizando Pool de Investimentos",
+    "content": content_encoded
+}
+
+# Cabeçalhos de autorização
+headers = {
+    "Authorization": f"token {token}",
+    "Content-Type": "application/json"
+}
+
+# Fazer a solicitação PUT para enviar o arquivo
+response = requests.put(url, json=data, headers=headers)
+
+# Verificar o status da resposta
+if response.status_code == 201:
+    st.write("Arquivo enviado com sucesso para o GitHub!")
+else:
+    st.write(f"Erro ao enviar o arquivo para o GitHub: {response.json()}")
+
+
 
 # Exibir a distribuição ideal do investimento
 print(distribuicao_df)
