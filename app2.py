@@ -38,8 +38,8 @@ dados_historicos_completos = yf.download(tickers_acoes_cripto_dolar, start='2021
 dados_historicos_completos.fillna(dados_historicos_completos.mean(), inplace=True)
 
 # Verificar se ainda existem valores NaN
-st.write("Verificando valores NaN após preenchimento:")
-st.write(dados_historicos_completos.isna().sum())
+#st.write("Verificando valores NaN após preenchimento:")
+#st.write(dados_historicos_completos.isna().sum())
 
 # Calcular os retornos diários e o desvio padrão (volatilidade) anualizado para as 15 ações, criptos e dólar
 retornos_diarios_completos = dados_historicos_completos.pct_change().dropna()
@@ -56,6 +56,9 @@ riscos_fixa_tesouro = np.array([0.05, 0.06, 0.04, 0.03, 0.04, 0.05, 0.05, 0.05, 
 
 # Combinar os riscos de ações, criptomoedas e renda fixa/tesouro para totalizar 34 ativos
 riscos_completos_final = np.concatenate((riscos_acoes_cripto_dolar.values, riscos_fixa_tesouro))
+
+# Pergunta sobre o uso do elitismo (Sim ou Não)
+usar_elitismo = st.radio("Deseja usar elitismo?", ('Sim', 'Não'))
 
 # Função para calcular o Sharpe Ratio com penalização e normalização
 def calcular_sharpe(portfolio, retornos, riscos, taxa_livre_risco):
