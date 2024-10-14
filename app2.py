@@ -17,7 +17,6 @@ taxa_mutacao = st.slider("Taxa de Mutação", min_value=0.01, max_value=0.2, val
 taxa_livre_risco = st.number_input("Taxa Livre de Risco (Ex: SELIC, POUPANÇA)", value=0.1075)
 
 # Pergunta sobre o uso do elitismo (Sim ou Não)
-#usar_elitismo = st.radio("Deseja usar elitismo?", ('Sim', 'Não'))
 usar_elitismo = st.selectbox("Deseja usar elitismo?", options=["Sim", "Não"])
 
 # Convertendo a resposta para um valor booleano
@@ -70,26 +69,19 @@ riscos_fixa_tesouro = np.array([0.05, 0.06, 0.04, 0.03, 0.04, 0.05, 0.05, 0.05, 
 # Combinar os riscos de ações, criptomoedas e renda fixa/tesouro para totalizar 34 ativos
 riscos_completos_final = np.concatenate((riscos_acoes_cripto_dolar.values, riscos_fixa_tesouro))
 
-
 # Função para calcular o Sharpe Ratio com penalização e normalização
 def calcular_sharpe(portfolio, retornos, riscos, taxa_livre_risco):
     retorno_portfolio = np.dot(portfolio, retornos)  # Retorno ponderado
     risco_portfolio = np.sqrt(np.dot(portfolio, riscos ** 2))  # Risco ponderado
 
-        # Evitar divisões por zero ou risco muito baixo  OBS
+    # Evitar divisões por zero ou risco muito baixo
     if risco_portfolio < 0.01:
         risco_portfolio = 0.01
 
     # Calcular o Sharpe Ratio
     sharpe_ratio = (retorno_portfolio - taxa_livre_risco) / risco_portfolio
 
-    # Adicionar limites superiores e inferiores ao Sharpe Ratio para evitar valores irreais
-    # Penalidade para Sharpe Ratios irreais (exemplo: se for maior que 3.5)
-    #if sharpe_ratio > 3.5:
-        #penalidade = 1 + (sharpe_ratio - 3.5) # Penalizar acima de 3.5
-        #sharpe_ratio = sharpe_ratio / penalidade
-    #return sharpe_ratio
-
+    # Penalizar Sharpe Ratios muito baixos ou altos
     if sharpe_ratio < 1.0:  # Exemplo: penalizar Sharpe Ratios muito baixos
         sharpe_ratio = sharpe_ratio * 0.8  # Penalidade adicional
     elif sharpe_ratio > 3:  # Permitir mais exploração de ativos com Sharpe Ratio maior
@@ -104,21 +96,12 @@ def gerar_portfolios_com_genoma_inicial(genoma_inicial, num_portfolios, num_ativ
         populacao.append(np.random.dirichlet(np.ones(num_ativos)))
     return populacao
 
-
 # Ajustar os limites de alocação para permitir uma maior concentração em ativos de alto retorno
 def ajustar_alocacao(portfolio, limite_max=0.25):
     # Aumentamos o limite de alocação de 20% para 25%
     portfolio = np.clip(portfolio, 0, limite_max)  # Limitar entre 0 e 25%
     portfolio /= portfolio.sum()  # Normalizar para garantir que a soma seja 1
     return portfolio
-
-# Função de mutação ajustada para permitir maior variabilidade
-#def mutacao(portfolio, taxa_mutacao=0.05, limite_max=0.25):
-    #if np.random.random() < taxa_mutacao:
-       # i = np.random.randint(0, len(portfolio))
-       # portfolio[i] += np.random.uniform(-0.1, 0.1)  # Permitir uma variação maior
-       # portfolio = ajustar_alocacao(portfolio, limite_max)  # Garantir que os valores estejam entre 0 e 25% e normalizar
-   # return portfolio
 
 # Função de mutação com taxa ajustável
 def mutacao(portfolio, taxa_mutacao, limite_max=0.25):
@@ -130,7 +113,7 @@ def mutacao(portfolio, taxa_mutacao, limite_max=0.25):
 
 # Função de Crossover de ponto único ajustada com verificação de índices
 def cruzamento(pai1, pai2):
-    # Vamos variar a quantidade de pontos de corte entre 1 e 3 para mais diversidade Exploration x Explotation
+    # Vamos variar a quantidade de pontos de corte entre 1 e 3 para mais diversidade
     num_pontos_corte = np.random.randint(1, 4)  # Gerar de 1 a 3 pontos de corte
     pontos_corte = sorted(np.random.choice(range(1, len(pai1)), num_pontos_corte, replace=False))
     filho1, filho2 = pai1.copy(), pai2.copy()
@@ -145,28 +128,16 @@ def cruzamento(pai1, pai2):
         filho2[pontos_corte[i]:pontos_corte[i+1]] = pai1[pontos_corte[i]:pontos_corte[i+1]]
 
     # Ajustar e normalizar os filhos
-    filho1 = ajustar_alocacao(filho1) # Limitar a alocação por ativo e normalizar
-    filho2 = ajustar_alocacao(filho2) # Limitar a alocação por ativo e normalizar
+    filho1 = ajustar_alocacao(filho1)  # Limitar a alocação por ativo e normalizar
+    filho2 = ajustar_alocacao(filho2)  # Limitar a alocação por ativo e normalizar
 
     return filho1, filho2
-
-# Função para gerar o genoma inicial de portfólios com 34 ativos
-genoma_inicial = np.array([
-    0.00, 0.00, 0.20, 0.00, 0.05, 0.00, 0.03, 0.00, 0.00, 0.03,
-    0.05, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.05, 0.05, 0.06,
-    0.10, 0.00, 0.00, 0.00, 0.05, 0.05, 0.05, 0.05, 0.00, 0.05,
-    0.05, 0.03, 0.05, 0.00
-])
-
-# Verificando se a soma das alocações é 100%
-assert np.isclose(genoma_inicial.sum(), 1.0), "As alocações devem somar 100% (ou 1.0 em fração)"
 
 # Função para rodar o algoritmo genético com ajustes de penalidade e variabilidade
 def algoritmo_genetico_com_genoma_inicial(retornos, riscos, genoma_inicial, taxa_livre_risco=0.1075, num_portfolios=100, geracoes=100):
     populacao = gerar_portfolios_com_genoma_inicial(genoma_inicial, num_portfolios, len(retornos))
     melhor_portfolio = genoma_inicial
     melhor_sharpe = calcular_sharpe(genoma_inicial, retornos, riscos, taxa_livre_risco)
-
 
     for geracao in range(geracoes):
         # Calcular o Sharpe Ratio (fitness) para cada portfólio
@@ -181,7 +152,6 @@ def algoritmo_genetico_com_genoma_inicial(retornos, riscos, genoma_inicial, taxa
         if fitness_scores[indice_melhor_portfolio] > melhor_sharpe:
             melhor_sharpe = fitness_scores[indice_melhor_portfolio]
             melhor_portfolio = populacao[indice_melhor_portfolio]
-       
 
         # Seleção, cruzamento e mutação
         populacao = selecao_torneio(populacao, fitness_scores)
@@ -194,32 +164,22 @@ def algoritmo_genetico_com_genoma_inicial(retornos, riscos, genoma_inicial, taxa
             filho1 = ajustar_alocacao(filho1)  # Limitar a alocação por ativo e normalizar
             filho2 = ajustar_alocacao(filho2)  # Limitar a alocação por ativo e normalizar
             
-            nova_populacao.append(mutacao(filho1))
-            nova_populacao.append(mutacao(filho2))
-           
-# Inserir o elitismo: garantir que o melhor portfólio da geração anterior permaneça
-if usar_elitismo:
-    nova_populacao[0] = melhor_portfolio  # Garantir que o melhor portfólio da geração anterior permaneça
+            nova_populacao.append(mutacao(filho1, taxa_mutacao))  # Adicionar a taxa de mutação ajustável
+            nova_populacao.append(mutacao(filho2, taxa_mutacao))  # Adicionar a taxa de mutação ajustável
 
-# Atualizar a população
-populacao = nova_populacao
+        # Inserir o elitismo: garantir que o melhor portfólio da geração anterior permaneça
+        if usar_elitismo:
+            nova_populacao[0] = melhor_portfolio  # Garantir que o melhor portfólio da geração anterior permaneça
 
-# Exibir o melhor Sharpe Ratio da geração atual no Streamlit
-st.write(f"Geracao {geracao + 1}, Melhor Sharpe Ratio: {melhor_sharpe:.2f}")
+        # Atualizar a população
+        populacao = nova_populacao
 
-return melhor_portfolio
-    
-# Rodar o algoritmo com os parâmetros selecionados
-#melhor_portfolio = algoritmo_genetico_com_genoma_inicial(
-    #retornos_reais,  # Usar a variável de retornos correta
-    #riscos_completos_final,  # Riscos já estão corretos
-    #genoma_inicial,
-    #taxa_livre_risco,
-    #usar_elitismo=usar_elitismo,
-    #taxa_mutacao=taxa_mutacao
-#)
+        # Exibir o melhor Sharpe Ratio da geração atual no Streamlit
+        st.write(f"Geracao {geracao + 1}, Melhor Sharpe Ratio: {melhor_sharpe:.2f}")
 
-# Funções auxiliares: seleção por torneio
+    return melhor_portfolio
+
+# Função auxiliar: seleção por torneio
 def selecao_torneio(populacao, fitness_scores, tamanho_torneio=3):
     selecionados = []
     for _ in range(len(populacao)):
@@ -237,12 +197,9 @@ retornos_ajustados[10:14] *= 1.2  # Aumentar em 20% os retornos das criptos
 retornos_ajustados[:10] *= 1.15   # Aumentar em 15% os retornos das ações
 riscos_reais = riscos_completos_final  # Riscos combinados para os 34 ativos
 
-# Rodar o algoritmo genético com o genoma inicial fixo
-#melhor_portfolio = algoritmo_genetico_com_genoma_inicial(retornos_reais, riscos_reais, genoma_inicial)
-
 # Rodar o algoritmo com os parâmetros selecionados
 melhor_portfolio = algoritmo_genetico_com_genoma_inicial(
-     retornos_reais,  # Usar a variável de retornos correta
+    retornos_ajustados,  # Usar a variável de retornos ajustada
     riscos_completos_final,  # Riscos já estão corretos
     genoma_inicial,
     taxa_livre_risco,
@@ -281,4 +238,6 @@ retorno_36m = np.dot(melhor_portfolio, retornos_36m)
 st.write(f"Retorno esperado em 12 meses: {retorno_12m:.2f}%")
 st.write(f"Retorno esperado em 24 meses: {retorno_24m:.2f}%")
 st.write(f"Retorno esperado em 36 meses: {retorno_36m:.2f}%")
+
+
 
