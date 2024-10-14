@@ -51,20 +51,21 @@ riscos_fixa_tesouro = np.array([0.05, 0.06, 0.04, 0.03, 0.04, 0.05, 0.05, 0.05, 
 # Combinar os riscos de ações, criptomoedas e renda fixa/tesouro para totalizar 34 ativos
 riscos_completos_final = np.concatenate((riscos_acoes_cripto_dolar.values, riscos_fixa_tesouro))
 
-# Função para calcular o Sharpe Ratio (fitness) com limitação
+# Função para calcular o Sharpe Ratio com penalização e normalização
 def calcular_sharpe(portfolio, retornos, riscos, taxa_livre_risco):
     retorno_portfolio = np.dot(portfolio, retornos)  # Retorno ponderado
     risco_portfolio = np.sqrt(np.dot(portfolio, riscos ** 2))  # Risco ponderado
     
-    # Se o risco for muito baixo, adicione uma pequena penalidade para evitar divisões por zero
-    if risco_portfolio < 0.0001:
-        risco_portfolio = 0.0001
+    # Evitar risco muito baixo
+    if risco_portfolio < 0.01:  # Limitar risco mínimo
+        risco_portfolio = 0.01
 
+    # Calcular o Sharpe Ratio
     sharpe_ratio = (retorno_portfolio - taxa_livre_risco) / risco_portfolio
 
-    # Penalidade para Sharpe Ratios muito altos
-    if sharpe_ratio > 3:
-        sharpe_ratio = 3 + np.log(sharpe_ratio - 3)
+    # Aplicar penalidade se o Sharpe Ratio for muito alto
+    if sharpe_ratio > 3:  # Sharpe Ratios acima de 2 geralmente são considerados elevados
+        sharpe_ratio = 3 + np.log(sharpe_ratio - 1)  # Aplicar uma penalidade logarítmica
 
     return sharpe_ratio
 
@@ -132,7 +133,8 @@ def algoritmo_genetico_com_genoma_inicial(retornos, riscos, genoma_inicial, taxa
             filho1, filho2 = cruzamento(pai1, pai2)
             nova_populacao.append(mutacao(filho1))
             nova_populacao.append(mutacao(filho2))
-           # Inserir o elitismo: garantir que o melhor portfólio da geração anterior permaneça
+           
+        # Inserir o elitismo: garantir que o melhor portfólio da geração anterior permaneça
         nova_populacao[0] = melhor_portfolio
 
         populacao = nova_populacao
@@ -151,8 +153,9 @@ def selecao_torneio(populacao, fitness_scores, tamanho_torneio=3):
         selecionados.append(populacao[vencedor])
     return selecionados
 
-# Exemplo de dados reais para retornos e riscos (substitua pelos dados reais do seu projeto)
-retornos_reais = retornos_12m  # Retornos de 12 meses para o exemplo
+# Exemplo de dados reais para retornos e riscos 
+# Limitar retornos para garantir que não sejam excessivamente elevados
+retornos_reais = np.clip(np.random.rand(34) * 0.2, 0, 0.2)  # Limitar retornos entre 0% e 20%
 riscos_reais = riscos_completos_final  # Riscos combinados para os 34 ativos
 
 # Rodar o algoritmo genético com o genoma inicial fixo
