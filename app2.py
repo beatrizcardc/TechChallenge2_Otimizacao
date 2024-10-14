@@ -70,6 +70,13 @@ def calcular_sharpe(portfolio, retornos, riscos, taxa_livre_risco):
         sharpe_ratio = sharpe_ratio / penalidade
     return sharpe_ratio
 
+# Função para gerar a população inicial com o genoma inicial fixo
+def gerar_portfolios_com_genoma_inicial(genoma_inicial, num_portfolios, num_ativos):
+    populacao = [genoma_inicial]  # Começar com o genoma inicial fixo
+    for _ in range(num_portfolios - 1):  # Gerar o restante aleatoriamente
+        populacao.append(np.random.dirichlet(np.ones(num_ativos)))
+    return populacao
+
 
 # Função para garantir que não há alocações negativas ou acima de 20%
 def ajustar_alocacao(portfolio):
