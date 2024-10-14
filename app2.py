@@ -46,10 +46,10 @@ retornos_diarios_completos = dados_historicos_completos.pct_change().dropna()
 riscos_acoes_cripto_dolar = retornos_diarios_completos.std() * np.sqrt(252)  # Riscos anualizados (15 ativos)
 
 # Ajustar riscos para criptomoedas e ativos mais arriscados
-#risco_cripto = riscos_acoes_cripto_dolar[10:14] * 1.0  # Ponderar mais para os criptoativos (Bitcoin, Cardano, Ethereum, Litecoin)
+risco_cripto = riscos_acoes_cripto_dolar[10:14] * 1.0  # Ponderar mais para os criptoativos (Bitcoin, Cardano, Ethereum, Litecoin)
 
 # Atualizar os riscos das criptomoedas com o novo valor ponderado
-#riscos_acoes_cripto_dolar[10:14] = risco_cripto
+riscos_acoes_cripto_dolar[10:14] = risco_cripto
 
 # Definir riscos assumidos para os ativos de renda fixa e tesouro (totalizando 19 ativos)
 riscos_fixa_tesouro = np.array([0.05, 0.06, 0.04, 0.03, 0.04, 0.05, 0.05, 0.05, 0.06, 0.04, 0.05, 0.03, 0.04, 0.06, 0.04, 0.05, 0.03, 0.04, 0.03])
@@ -78,7 +78,7 @@ def calcular_sharpe(portfolio, retornos, riscos, taxa_livre_risco):
 
     if sharpe_ratio < 1.0:  # Exemplo: penalizar Sharpe Ratios muito baixos
         sharpe_ratio = sharpe_ratio * 0.8  # Penalidade adicional
-    elif sharpe_ratio > 7:  # Permitir mais exploração de ativos com Sharpe Ratio maior
+    elif sharpe_ratio > 4:  # Permitir mais exploração de ativos com Sharpe Ratio maior
         sharpe_ratio = sharpe_ratio * 1.2  # Recompensa para maiores Sharpe Ratios
 
     return sharpe_ratio
