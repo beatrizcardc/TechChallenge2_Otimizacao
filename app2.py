@@ -197,20 +197,17 @@ def algoritmo_genetico_com_genoma_inicial(retornos, riscos, genoma_inicial, taxa
             nova_populacao.append(mutacao(filho1))
             nova_populacao.append(mutacao(filho2))
            
-# Inserir o botão de seleção elitismo: garantir que o melhor portfólio da geração anterior permaneça
-    if usar_elitismo:
+# Inserir o elitismo: garantir que o melhor portfólio da geração anterior permaneça
+if usar_elitismo:
     nova_populacao[0] = melhor_portfolio  # Garantir que o melhor portfólio da geração anterior permaneça
 
-        populacao = nova_populacao
-        st.write(f"Geracao {geracao + 1}, Melhor Sharpe Ratio: {melhor_sharpe:.2f}")
-       
-        #nova_populacao[0] = melhor_portfolio
-        #populacao = nova_populacao
+# Atualizar a população
+populacao = nova_populacao
 
-        # Exibir o melhor Sharpe Ratio da geração atual no Streamlit
-        st.write(f"Geracao {geracao + 1}, Melhor Sharpe Ratio: {melhor_sharpe}")
+# Exibir o melhor Sharpe Ratio da geração atual no Streamlit
+st.write(f"Geracao {geracao + 1}, Melhor Sharpe Ratio: {melhor_sharpe:.2f}")
 
-    return melhor_portfolio
+return melhor_portfolio
     
 # Rodar o algoritmo com os parâmetros selecionados
 #melhor_portfolio = algoritmo_genetico_com_genoma_inicial(
