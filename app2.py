@@ -64,9 +64,9 @@ def calcular_sharpe(portfolio, retornos, riscos, taxa_livre_risco):
     sharpe_ratio = (retorno_portfolio - taxa_livre_risco) / risco_portfolio
 
     # Adicionar limites superiores e inferiores ao Sharpe Ratio para evitar valores irreais
-    # Penalidade para Sharpe Ratios irreais (exemplo: se for maior que 3)
-    if sharpe_ratio > 3:
-        penalidade = 1 + (sharpe_ratio - 3)  # Aumenta a penalidade quanto maior for o valor acima de 3
+    # Penalidade para Sharpe Ratios irreais (exemplo: se for maior que 5)
+    if sharpe_ratio > 5:
+        penalidade = 1 + (sharpe_ratio - 5) / 2 # Penalizar com um fator menor
         sharpe_ratio = sharpe_ratio / penalidade
     return sharpe_ratio
 
@@ -85,7 +85,7 @@ def ajustar_alocacao(portfolio):
     return portfolio
 
 # Função de mutação ajustada para evitar valores negativos e respeitar limite de 20%
-def mutacao(portfolio, taxa_mutacao=0.05):  # Aumentar a taxa de mutação de 0.01 para 0.05
+def mutacao(portfolio, taxa_mutacao=0.1):  # Aumentar a taxa de mutação para 10%
     if np.random.random() < taxa_mutacao:
         i = np.random.randint(0, len(portfolio))
         portfolio[i] += np.random.uniform(-0.1, 0.1) # Permitir uma variação maior
@@ -182,7 +182,7 @@ def selecao_torneio(populacao, fitness_scores, tamanho_torneio=3):
 
 # Exemplo de dados reais para retornos e riscos 
 # Limitar retornos para garantir que não sejam excessivamente elevados
-retornos_reais = np.clip(np.random.rand(34) * 0.2, 0, 0.4)  # Limitar retornos entre 0% e 40%
+retornos_reais = np.random.rand(34) * 0.2  # Retornos simulados entre 0% e 20%
 riscos_reais = riscos_completos_final  # Riscos combinados para os 34 ativos
 
 # Rodar o algoritmo genético com o genoma inicial fixo
