@@ -298,30 +298,33 @@ for geracao in range(geracoes):
         if verificar_retorno(portfolio, retornos_12m, retornos_24m, retornos_36m, metas_retorno):
             melhor_portfolio = portfolio
             break
-    if melhor_portfolio:
+    if melhor_portfolio is not None:
         break
 
     
     # Caso o algoritmo encontre um portfólio que atenda às metas, exibir os resultados
-    if melhor_portfolio:
-        distribuicao_investimento = melhor_portfolio * valor_total
-        distribuicao_df = pd.DataFrame({
-            'Ativo': ativos,
-            'Alocacao (%)': melhor_portfolio * 100,
-            'Valor Investido (R$)': distribuicao_investimento
-        })
-        
-        st.write("Novo portfólio encontrado para atingir as metas de retorno:")
-        st.dataframe(distribuicao_df.style.format({'Alocacao (%)': '{:.2f}', 'Valor Investido (R$)': '{:.2f}'}))
-        
-        retorno_12m = np.dot(melhor_portfolio, retornos_12m)
-        retorno_24m = np.dot(melhor_portfolio, retornos_24m)
-        retorno_36m = np.dot(melhor_portfolio, retornos_36m)
-        
-        st.write(f"Novo retorno esperado em 12 meses: {retorno_12m:.2f}%")
-        st.write(f"Novo retorno esperado em 24 meses: {retorno_24m:.2f}%")
-        st.write(f"Novo retorno esperado em 36 meses: {retorno_36m:.2f}%")
-    else:
-        st.write("Não foi encontrado um portfólio que atenda às metas de retorno especificadas.")
+if melhor_portfolio is not None:
+    distribuicao_investimento = melhor_portfolio * valor_total
+    distribuicao_df = pd.DataFrame({
+        'Ativo': ativos,
+        'Alocacao (%)': melhor_portfolio * 100,
+        'Valor Investido (R$)': distribuicao_investimento
+    })
+
+    st.write("Novo portfólio encontrado para atingir as metas de retorno:")
+    st.dataframe(distribuicao_df.style.format({'Alocacao (%)': '{:.2f}', 'Valor Investido (R$)': '{:.2f}'}))
+
+    # Calcular os novos retornos com base no portfólio encontrado
+    retorno_12m = np.dot(melhor_portfolio, retornos_12m)
+    retorno_24m = np.dot(melhor_portfolio, retornos_24m)
+    retorno_36m = np.dot(melhor_portfolio, retornos_36m)
+
+    # Exibir os novos retornos esperados no Streamlit
+    st.write(f"Novo retorno esperado em 12 meses: {retorno_12m:.2f}%")
+    st.write(f"Novo retorno esperado em 24 meses: {retorno_24m:.2f}%")
+    st.write(f"Novo retorno esperado em 36 meses: {retorno_36m:.2f}%")
+else:
+    st.write("Não foi encontrado um portfólio que atenda às metas de retorno especificadas.")
+
 
 
