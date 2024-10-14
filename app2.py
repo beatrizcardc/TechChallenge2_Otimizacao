@@ -64,11 +64,10 @@ def calcular_sharpe(portfolio, retornos, riscos, taxa_livre_risco):
     sharpe_ratio = (retorno_portfolio - taxa_livre_risco) / risco_portfolio
 
     # Adicionar limites superiores e inferiores ao Sharpe Ratio para evitar valores irreais
+    # Penalidade para Sharpe Ratios irreais (exemplo: se for maior que 3)
     if sharpe_ratio > 3:
-        sharpe_ratio = 3 + np.log(sharpe_ratio - 2)  # Penaliza Sharpe Ratio muito alto
-    elif sharpe_ratio < 0.5:  # Penalizar Sharpe muito baixo
-        sharpe_ratio *= 1.5  # Aumentar o valor baixo suavemente
-
+        penalidade = 1 + (sharpe_ratio - 3)  # Aumenta a penalidade quanto maior for o valor acima de 3
+        sharpe_ratio = sharpe_ratio / penalidade
     return sharpe_ratio
 
 
@@ -79,18 +78,23 @@ def ajustar_alocacao(portfolio):
     return portfolio
 
 # Função de mutação ajustada para evitar valores negativos e respeitar limite de 20%
-def mutacao(portfolio, taxa_mutacao=0.01):
+def mutacao(portfolio, taxa_mutacao=0.05):  # Aumentar a taxa de mutação de 0.01 para 0.05
     if np.random.random() < taxa_mutacao:
         i = np.random.randint(0, len(portfolio))
-        portfolio[i] += np.random.uniform(-0.1, 0.1)
+        portfolio[i] += np.random.uniform(-0.1, 0.1) # Permitir uma variação maior
         portfolio = ajustar_alocacao(portfolio)  # Garantir que os valores estejam entre 0 e 20% e normalizar
     return portfolio
 
 # Função de cruzamento de ponto único ajustada
 def cruzamento(pai1, pai2):
-    ponto_corte = np.random.randint(1, len(pai1) - 1)
-    filho1 = np.concatenate((pai1[:ponto_corte], pai2[ponto_corte:]))
-    filho2 = np.concatenate((pai2[:ponto_corte:], pai1[ponto_corte:]))
+    # Vamos variar a quantidade de pontos de corte entre 1 e 3 para mais diversidade Exploration x Explotation
+    num_pontos_corte = np.random.randint(1, 4)  
+    pontos_corte = sorted(np.random.choice(range(1, len(pai1)), num_pontos_corte, replace=False))
+    filho1, filho2 = pai1.copy(), pai2.copy()
+
+     for i in range(0, len(pontos_corte), 2):
+        filho1[pontos_corte[i]:pontos_corte[i+1]] = pai2[pontos_corte[i]:pontos_corte[i+1]]
+        filho2[pontos_corte[i]:pontos_corte[i+1]] = pai1[pontos_corte[i]:pontos_corte[i+1]]
 
     # Ajustar e normalizar os filhos
     filho1 = ajustar_alocacao(filho1)
@@ -109,24 +113,27 @@ genoma_inicial = np.array([
 # Verificando se a soma das alocações é 100%
 assert np.isclose(genoma_inicial.sum(), 1.0), "As alocações devem somar 100% (ou 1.0 em fração)"
 
-# Função para rodar o algoritmo genético com genoma inicial fixo
+# Função para rodar o algoritmo genético com ajustes de penalidade e variabilidade
 def algoritmo_genetico_com_genoma_inicial(retornos, riscos, genoma_inicial, taxa_livre_risco=0.1075, num_portfolios=100, geracoes=100):
-    populacao = [genoma_inicial]
-    for _ in range(num_portfolios - 1):
-        populacao.append(np.random.dirichlet(np.ones(len(genoma_inicial))))
-    
+    populacao = gerar_portfolios_com_genoma_inicial(genoma_inicial, num_portfolios, len(retornos))
     melhor_portfolio = genoma_inicial
     melhor_sharpe = calcular_sharpe(genoma_inicial, retornos, riscos, taxa_livre_risco)
+
 
     for geracao in range(geracoes):
         # Calcular o Sharpe Ratio (fitness) para cada portfólio
         fitness_scores = np.array([calcular_sharpe(port, retornos, riscos, taxa_livre_risco) for port in populacao])
+
+        # Verificar se algum portfólio é inválido (alocação fora do intervalo permitido)
+        for portfolio in populacao:
+            assert np.isclose(portfolio.sum(), 1.0), "Portfólio inválido: soma das alocações não é 100%"
 
         # Identificar o melhor portfólio
         indice_melhor_portfolio = np.argmax(fitness_scores)
         if fitness_scores[indice_melhor_portfolio] > melhor_sharpe:
             melhor_sharpe = fitness_scores[indice_melhor_portfolio]
             melhor_portfolio = populacao[indice_melhor_portfolio]
+       
 
         # Seleção, cruzamento e mutação
         populacao = selecao_torneio(populacao, fitness_scores)
