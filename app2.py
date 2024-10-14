@@ -238,7 +238,17 @@ retornos_ajustados[:10] *= 1.15   # Aumentar em 15% os retornos das ações
 riscos_reais = riscos_completos_final  # Riscos combinados para os 34 ativos
 
 # Rodar o algoritmo genético com o genoma inicial fixo
-melhor_portfolio = algoritmo_genetico_com_genoma_inicial(retornos_reais, riscos_reais, genoma_inicial)
+#melhor_portfolio = algoritmo_genetico_com_genoma_inicial(retornos_reais, riscos_reais, genoma_inicial)
+
+# Rodar o algoritmo com os parâmetros selecionados
+melhor_portfolio = algoritmo_genetico_com_genoma_inicial(
+    retornos_reais,  # Usar a variável de retornos correta
+    riscos_completos_final,  # Riscos já estão corretos
+    genoma_inicial,
+    taxa_livre_risco,
+    usar_elitismo=usar_elitismo,
+    taxa_mutacao=taxa_mutacao
+)
 
 # Distribuir o valor total de investimento entre os ativos com base na melhor alocação
 total_investido = valor_total  # Usando o valor definido pelo usuário no Streamlit
