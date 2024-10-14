@@ -63,8 +63,8 @@ def calcular_sharpe(portfolio, retornos, riscos, taxa_livre_risco):
     sharpe_ratio = (retorno_portfolio - taxa_livre_risco) / risco_portfolio
 
     # Penalidade para Sharpe Ratios muito altos
-    if sharpe_ratio > 3.5:
-        sharpe_ratio = 3.5 + np.log(sharpe_ratio - 3)
+    if sharpe_ratio > 3:
+        sharpe_ratio = 3 + np.log(sharpe_ratio - 3)
 
     return sharpe_ratio
 
