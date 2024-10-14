@@ -86,7 +86,7 @@ def gerar_portfolios_com_genoma_inicial(genoma_inicial, num_portfolios, num_ativ
 
 # Função para garantir que não há alocações negativas 
 def ajustar_alocacao(portfolio):
-    portfolio = np.clip(portfolio, 0, 0.10)  # Limitar ativos de menor retorno a 10%
+    portfolio = np.clip(portfolio, 0, 0.2)  # Limitar ativos de menor retorno a 20%
     portfolio /= portfolio.sum()  # Normalizar para garantir que a soma seja 1
     return portfolio
 
@@ -95,7 +95,7 @@ def mutacao(portfolio, taxa_mutacao=0.1):  # Aumentar a taxa de mutação para 1
     if np.random.random() < taxa_mutacao:
         i = np.random.randint(0, len(portfolio))
         portfolio[i] += np.random.uniform(-0.1, 0.1) # Permitir uma variação maior
-        portfolio = ajustar_alocacao(portfolio)  # Garantir que os valores estejam limitados entre 0 e 10% e normalizar
+        portfolio = ajustar_alocacao(portfolio)  # Garantir que os valores estejam limitados entre 0 e 20% e normalizar
     return portfolio
 
 # Função de Crossover de ponto único ajustada com verificação de índices
@@ -132,7 +132,7 @@ genoma_inicial = np.array([
 assert np.isclose(genoma_inicial.sum(), 1.0), "As alocações devem somar 100% (ou 1.0 em fração)"
 
 # Função para rodar o algoritmo genético com ajustes de penalidade e variabilidade
-def algoritmo_genetico_com_genoma_inicial(retornos, riscos, genoma_inicial, taxa_livre_risco=0.1075, num_portfolios=100, geracoes=100):
+def algoritmo_genetico_com_genoma_inicial(retornos, riscos, genoma_inicial, taxa_livre_risco=0.1075, num_portfolios=150, geracoes=200):
     populacao = gerar_portfolios_com_genoma_inicial(genoma_inicial, num_portfolios, len(retornos))
     melhor_portfolio = genoma_inicial
     melhor_sharpe = calcular_sharpe(genoma_inicial, retornos, riscos, taxa_livre_risco)
