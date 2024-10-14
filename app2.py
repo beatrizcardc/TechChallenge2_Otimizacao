@@ -92,7 +92,7 @@ def cruzamento(pai1, pai2):
     pontos_corte = sorted(np.random.choice(range(1, len(pai1)), num_pontos_corte, replace=False))
     filho1, filho2 = pai1.copy(), pai2.copy()
 
-     for i in range(0, len(pontos_corte), 2):
+    for i in range(0, len(pontos_corte), 2):
         filho1[pontos_corte[i]:pontos_corte[i+1]] = pai2[pontos_corte[i]:pontos_corte[i+1]]
         filho2[pontos_corte[i]:pontos_corte[i+1]] = pai1[pontos_corte[i]:pontos_corte[i+1]]
 
