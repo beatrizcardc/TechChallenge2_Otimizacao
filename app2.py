@@ -1,3 +1,5 @@
+import streamlit as st  # Certifique-se de que o Streamlit está importado corretamente
+
 # Customização de CSS para fundo verde escuro e letras brancas
 st.markdown(
     """
@@ -27,6 +29,9 @@ st.markdown(
     """,
     unsafe_allow_html=True
 )
+
+# Seu código de Streamlit continua aqui...
+st.title("Otimização de Investimentos - Realize seus Objetivos")  # Exemplo de título que deve ser exibido em branco
 
 import streamlit as st
 import pandas as pd
