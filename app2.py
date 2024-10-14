@@ -1,3 +1,33 @@
+# Customização de CSS para fundo verde escuro e letras brancas
+st.markdown(
+    """
+    <style>
+    body {
+        background-color: #006400; /* Fundo verde escuro */
+        color: white; /* Texto em branco */
+    }
+    
+    .stApp {
+        background-color: #006400; /* Fundo verde escuro para toda a aplicação */
+        color: white; /* Texto em branco */
+    }
+
+    /* Estilo para os títulos */
+    h1, h2, h3, h4, h5, h6 {
+        color: white; /* Títulos em branco */
+    }
+
+    /* Estilo para os botões */
+    .stButton button {
+        background-color: #004d00; /* Fundo do botão em verde escuro */
+        color: white; /* Texto do botão em branco */
+    }
+
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+
 import streamlit as st
 import pandas as pd
 import numpy as np
