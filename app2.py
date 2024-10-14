@@ -1,5 +1,4 @@
-import streamlit as st  # Certifique-se de que o Streamlit está importado corretamente
-
+import streamlit as st  
 # Customização de CSS para fundo verde escuro e letras brancas
 st.markdown(
     """
