@@ -285,6 +285,10 @@ if personalizar_retorno == "Sim":
     
     # Definir as metas de retorno
     metas_retorno = [taxa_retorno_12m, taxa_retorno_24m, taxa_retorno_36m]
+
+# Garantir que as variáveis necessárias estão definidas
+num_portfolios = 100  # Defina o número de portfólios
+geracoes = 100  # Defina o número de gerações
     
     # Executar uma nova busca de portfólio que atenda às metas de retorno
     melhor_portfolio = None
