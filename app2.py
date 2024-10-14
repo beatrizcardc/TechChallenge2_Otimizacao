@@ -354,7 +354,7 @@ if personalizar_retorno == "Sim":
             break
 
     # Caso o algoritmo encontre um portfólio que atenda às metas, exibir os resultados
-    if melhor_portfolio:
+    if melhor_portfolio is not None:
         distribuicao_investimento = melhor_portfolio * valor_total
         distribuicao_df = pd.DataFrame({
             'Ativo': ativos,
