@@ -6,7 +6,8 @@ import matplotlib.pyplot as plt
 st.title('Otimize seu Portfólio')
 
 # Carregar os dados do CSV atualizado (deve conter 34 ativos)
-df = pd.read_csv('/content/Pool_Investimentos.csv')
+# Mudando o endereço para o github
+df = pd.read_csv('https://github.com/beatrizcardc/TechChallenge2_Otimizacao/blob/main/Pool_Investimentos.csv')
 
 # Extrair retornos do CSV para os 34 ativos
 retornos_12m = df['Rentabilidade 12 meses'].values
