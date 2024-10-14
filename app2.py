@@ -46,10 +46,10 @@ retornos_diarios_completos = dados_historicos_completos.pct_change().dropna()
 riscos_acoes_cripto_dolar = retornos_diarios_completos.std() * np.sqrt(252)  # Riscos anualizados (15 ativos)
 
 # Ajustar riscos para criptomoedas e ativos mais arriscados
-risco_cripto = riscos_acoes_cripto_dolar[10:14] * 1.5  # Ponderar mais para os criptoativos (Bitcoin, Cardano, Ethereum, Litecoin)
+#risco_cripto = riscos_acoes_cripto_dolar[10:14] * 1.5  # Ponderar mais para os criptoativos (Bitcoin, Cardano, Ethereum, Litecoin)
 
 # Atualizar os riscos das criptomoedas com o novo valor ponderado
-riscos_acoes_cripto_dolar[10:14] = risco_cripto
+#riscos_acoes_cripto_dolar[10:14] = risco_cripto
 
 # Definir riscos assumidos para os ativos de renda fixa e tesouro (totalizando 19 ativos)
 riscos_fixa_tesouro = np.array([0.05, 0.06, 0.04, 0.03, 0.04, 0.05, 0.05, 0.05, 0.06, 0.04, 0.05, 0.03, 0.04, 0.06, 0.04, 0.05, 0.03, 0.04, 0.03])
@@ -62,12 +62,7 @@ def calcular_sharpe(portfolio, retornos, riscos, taxa_livre_risco):
     retorno_portfolio = np.dot(portfolio, retornos)  # Retorno ponderado
     risco_portfolio = np.sqrt(np.dot(portfolio, riscos ** 2))  # Risco ponderado
 
-    # Penalidade para renda fixa acima de 15%
-    if np.sum(portfolio[:10]) > 0.15:
-        penalidade_renda_fixa = 1 + (np.sum(portfolio[:10]) - 0.15) * 2  # Penalizar de forma agressiva acima de 15%
-        retorno_portfolio /= penalidade_renda_fixa
-
-    # Evitar divisões por zero ou risco muito baixo
+        # Evitar divisões por zero ou risco muito baixo
     if risco_portfolio < 0.01:
         risco_portfolio = 0.01
 
@@ -84,7 +79,7 @@ def calcular_sharpe(portfolio, retornos, riscos, taxa_livre_risco):
     if sharpe_ratio < 1.0:  # Exemplo: penalizar Sharpe Ratios muito baixos
         sharpe_ratio = sharpe_ratio * 0.8  # Penalidade adicional
     elif sharpe_ratio > 3:  # Permitir mais exploração de ativos com Sharpe Ratio maior
-        sharpe_ratio = sharpe_ratio * 1.0  # Recompensa para maiores Sharpe Ratios
+        sharpe_ratio = sharpe_ratio * 0.2  # Recompensa para maiores Sharpe Ratios
 
     return sharpe_ratio
 
@@ -112,8 +107,8 @@ def mutacao(portfolio, taxa_mutacao=0.1):  # Aumentar a taxa de mutação para 1
 
 # Função de Crossover de ponto único ajustada com verificação de índices
 def cruzamento(pai1, pai2):
-    # Vamos variar a quantidade de pontos de corte entre 1 e 4 para mais diversidade Exploration x Explotation
-    num_pontos_corte = np.random.randint(1, 5)  # Gerar de 1 a 4 pontos de corte
+    # Vamos variar a quantidade de pontos de corte entre 1 e 3 para mais diversidade Exploration x Explotation
+    num_pontos_corte = np.random.randint(1, 4)  # Gerar de 1 a 3 pontos de corte
     pontos_corte = sorted(np.random.choice(range(1, len(pai1)), num_pontos_corte, replace=False))
     filho1, filho2 = pai1.copy(), pai2.copy()
 
@@ -144,7 +139,7 @@ genoma_inicial = np.array([
 assert np.isclose(genoma_inicial.sum(), 1.0), "As alocações devem somar 100% (ou 1.0 em fração)"
 
 # Função para rodar o algoritmo genético com ajustes de penalidade e variabilidade
-def algoritmo_genetico_com_genoma_inicial(retornos, riscos, genoma_inicial, taxa_livre_risco=0.1075, num_portfolios=150, geracoes=200):
+def algoritmo_genetico_com_genoma_inicial(retornos, riscos, genoma_inicial, taxa_livre_risco=0.1075, num_portfolios=100, geracoes=130):
     populacao = gerar_portfolios_com_genoma_inicial(genoma_inicial, num_portfolios, len(retornos))
     melhor_portfolio = genoma_inicial
     melhor_sharpe = calcular_sharpe(genoma_inicial, retornos, riscos, taxa_livre_risco)
