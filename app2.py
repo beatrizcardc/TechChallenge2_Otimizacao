@@ -37,6 +37,9 @@ st.markdown(
 # Título da aplicação
 st.title("Otimização de Investimentos - Realize seus Objetivos")
 
+# Explicação inicial do projeto
+st.write("Nosso app usa a Inteligência Artificial, com algoritmos genéticos, para otimizar a alocação de investimentos em ativos variados, considerando retornos e riscos.")
+
 # Caixas de texto explicativas
 st.write("### Conceitos Importantes")
 st.write("**Mutação**: A mutação é uma forma de introduzir variações em uma população de soluções.")
