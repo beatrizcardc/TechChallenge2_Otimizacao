@@ -11,8 +11,9 @@ Fizemos o desafio em 3 partes buscando uma solução para nossa carteira de ativ
 2ª Parte) As validações foram aplicadas no método de crossover de ponto único e constam do segundo video.
 Trouxemos o código validado e as alterações aplicadas para o Github.
 
-3ª Parte) Criamos nova parte do código com mais inputs para os usuários, especialmente o ajuste opcional das taxas de retorno.
-  Link 2º video: 
+3ª Parte) STREAMLIT: Criamos nova parte do código com mais inputs para os usuários, especialmente o ajuste opcional das taxas de retorno.
+  
+  Link 2º video: https://youtu.be/FWv9QrDMo6g 
 
 LINK PARA APP NO STREAMLIT: https://techchallenge2otimizacaogit-grupo18.streamlit.app/
 Veja o pdf 
