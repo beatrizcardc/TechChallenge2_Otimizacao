@@ -103,7 +103,10 @@ O critério de parada: é o número fixo de gerações. O algoritmo é configura
 
   ## LINKS:
   Github: https://github.com/beatrizcardc/TechChallenge2_Otimizacao
+  
   App Streamlit: https://techchallenge2otimizacaogit-grupo18.streamlit.app/
+  
   Video1: https://youtu.be/nidQdAVXoVY
+  
   Video2: https://youtu.be/FWv9QrDMo6g 
 
