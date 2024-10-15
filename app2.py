@@ -137,12 +137,6 @@ def calcular_sharpe(portfolio, retornos, riscos, taxa_livre_risco):
     # Calcular o Sharpe Ratio
     sharpe_ratio = (retorno_portfolio - taxa_livre_risco) / risco_portfolio
 
-    # Adicionar limites superiores e inferiores ao Sharpe Ratio para evitar valores irreais
-    if sharpe_ratio < 1.0:  # Penalizar Sharpe Ratios muito baixos
-        sharpe_ratio = sharpe_ratio * 0.8  # Penalidade adicional
-    elif sharpe_ratio > 3:  # Permitir mais exploração de ativos com Sharpe Ratio maior
-        sharpe_ratio = sharpe_ratio * 0.2  # Recompensa para maiores Sharpe Ratios
-
     return sharpe_ratio
 
 # Função para rodar o algoritmo genético com ajustes de penalidade e variabilidade
