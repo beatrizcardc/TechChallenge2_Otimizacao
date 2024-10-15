@@ -3,7 +3,7 @@
 Grupo 18 da PósTech em IA para devs da FIAP
 
 
-Fizemos o desafio em 3 partes buscando uma solução para nossa carteira de ativos.
+Fizemos o desafio em 4 partes buscando uma solução para nossa carteira de ativos.
 1ª Parte) no google colab com o notebook TechChallenge_2_grupo18validado.ipynb.
   Nessa etapa desenvolvemos o primeiro código, subimos o primeiro video e validamos com o Profº Sérgio Polimante.
   Link 1º video: https://youtu.be/nidQdAVXoVY 
@@ -15,8 +15,12 @@ Trouxemos o código validado e as alterações aplicadas para o Github.
   
   Link 2º video: https://youtu.be/FWv9QrDMo6g 
 
+4ª Parte) Validação Final : melhorias no Streamlit e critério de parada: 
+Antes: O algoritmo sempre rodava por 100 gerações, mesmo que a melhor solução fosse encontrada muito antes.
+Agora: O algoritmo para de rodar se, por exemplo, passar 10 gerações sem melhorar o Sharpe Ratio, indicando que provavelmente atingiu um ponto onde não há mais ganhos significativos.
+
 LINK PARA APP NO STREAMLIT: https://techchallenge2otimizacaogit-grupo18.streamlit.app/
-Veja o pdf 
+Veja o pdf 2ª validação e a 3ª validação - buscando um produto digital!
  ------------------------------------------------------
 
 ### Otimização de Portifólio de Investimentos com algoritmo genético
