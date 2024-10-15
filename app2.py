@@ -128,7 +128,6 @@ def algoritmo_genetico(retornos, riscos, genoma_inicial, taxa_livre_risco, num_p
     melhor_portfolio = genoma_inicial
     melhor_sharpe = calcular_sharpe(genoma_inicial, retornos, riscos, taxa_livre_risco)
     contador_sem_melhoria = 0
-    historico_sharpe = []
 
     for geracao in range(geracoes):
         fitness_scores = np.array([calcular_sharpe(port, retornos, riscos, taxa_livre_risco) for port in populacao])
@@ -140,25 +139,13 @@ def algoritmo_genetico(retornos, riscos, genoma_inicial, taxa_livre_risco, num_p
         else:
             contador_sem_melhoria += 1
 
-        historico_sharpe.append(melhor_sharpe)
-
-        populacao = selecao_torneio(populacao, fitness_scores)
-        nova_populacao = []
-        for i in range(0, len(populacao), 2):
-            pai1, pai2 = populacao[i], populacao[i+1]
-            filho1, filho2 = cruzamento(pai1, pai2)
-            nova_populacao.append(mutacao(filho1, taxa_mutacao))
-            nova_populacao.append(mutacao(filho2, taxa_mutacao))
-
-        if usar_elitismo:
-            nova_populacao[0] = melhor_portfolio
-
-        populacao = nova_populacao
+        # Exibir o melhor Sharpe Ratio da geração atual no Streamlit
+        st.write(f"Geracao {geracao + 1}, Melhor Sharpe Ratio: {melhor_sharpe:.2f}")
 
         if contador_sem_melhoria >= crit_parada:
             break
 
-    return melhor_portfolio, historico_sharpe
+    return melhor_portfolio
 
 # Funções auxiliares
 def gerar_portfolios_com_genoma_inicial(genoma_inicial, num_portfolios, num_ativos):
@@ -198,7 +185,7 @@ def mutacao(portfolio, taxa_mutacao, limite_max=0.25):
 
 # Gerar o portfólio otimizado
 genoma_inicial = np.random.dirichlet(np.ones(34))
-melhor_portfolio, historico_sharpe = algoritmo_genetico(
+melhor_portfolio = algoritmo_genetico(
     retornos=retornos_usados, 
     riscos=riscos_completos_final, 
     genoma_inicial=genoma_inicial, 
@@ -228,14 +215,6 @@ distribuicao_df.plot(kind='bar', x='Ativo', y='Alocacao (%)', legend=False)
 plt.title('Distribuição Percentual por Ativo')
 plt.ylabel('Alocacao (%)')
 st.pyplot(plt)
-
-# Exibir gráfico da evolução do Sharpe Ratio depois da tabela
-fig, ax = plt.subplots(figsize=(6, 3))  # Gráfico menor
-ax.plot(historico_sharpe, marker='o')
-ax.set_title('Evolução do Sharpe Ratio')
-ax.set_xlabel('Gerações')
-ax.set_ylabel('Melhor Sharpe Ratio')
-st.pyplot(fig)
 
 # Download do CSV atualizado
 csv = distribuicao_df.to_csv(index=False)
