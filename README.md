@@ -18,7 +18,7 @@ LINK PARA APP NO STREAMLIT: https://techchallenge2otimizacaogit-grupo18.streamli
 Veja o pdf 
  ------------------------------------------------------
 
-###Otimização de Portifólio de Investimentos com algoritmo genético
+### Otimização de Portifólio de Investimentos com algoritmo genético
 TechChallenge IA para Devs - PósTech FIAP >> Grupo 18
 
 O primeiro trabalho foi criar um dataframe pertinente. Buscamos uma lista de ativos que representasse diferentes perfis de investidores, mas que fossem acessíveis ainda para amadores.
@@ -49,16 +49,53 @@ EAP - Análise dos Dados
 
 Algorítimo Genético
 
-População Inicial: Criamos uma população inicial de portfólios, genoma.
+✅População Inicial: Criamos uma população inicial de portfólios, genoma.
 
-Função de Fitness: Avaliaremos cada portfólio usando a relação de Sharpe (retorno vs. risco).
+✅Função de Fitness: Avaliaremos cada portfólio usando a relação de Sharpe (retorno vs. risco).
 
-Seleção: Selecionaremos os melhores portfólios com base na função de fitness.
+✅Seleção: Selecionaremos os melhores portfólios com base na função de fitness.
 
-Cruzamento e Mutação: Cruzamos os melhores portfólios para gerar novos e aplicamos mutações.
+✅Cruzamento e Mutação: Cruzamos os melhores portfólios para gerar novos e aplicamos mutações.
 
-Critério de Parada: Rodaremos o algoritmo por um número fixo de gerações ou até que não haja mais melhoria significativa.
+✅Critério de Parada: Rodaremos o algoritmo por um número fixo de gerações ou até que não haja mais melhoria significativa.
 
-OBS: Aplicaremos soluções para avaliar e restringir que nenhuma população criada (portfólio) seja inferior ou superior a 100%
-OBS: Aplicaremos o elitismo, para selecionar os melhores portfólios a cada geração.
-OBS: Aplicaremos o Streamlit
+  *OBS: Aplicaremos soluções para avaliar e restringir que nenhuma população criada (portfólio) seja inferior ou superior a 100%
+  
+  *OBS: Aplicaremos o elitismo, para selecionar os melhores portfólios a cada geração
+  
+  *OBS: Usaremos o Streamlit
+
+### Perguntas de referência
+Qual é a representação da solução (genoma)?
+
+Qual é a função de fitness?
+
+Qual é o método de seleção?
+
+Qual método de crossover você vai implementar?
+
+Qual será o método de inicialização?
+
+Qual o critério de parada?
+
+Representação da solução (genoma): O genoma é representado por um array de números reais (frações) que somam 1.0 (ou 100%), indicando a alocação percentual de cada ativo no portfólio. Fizemos um array manual para os 34 ativos. No primeiro teste com todos os ativos alocados e no segundo com alguns somente.
+
+Função de fitness: A função de fitness é o Sharpe Ratio, que mede o retorno ajustado ao risco do portfólio. Quanto maior o Sharpe Ratio, melhor o portfólio. O objetivo é maximizar o Sharpe Ratio, o que significa encontrar um portfólio com alto retorno esperado e baixo risco (desvio padrão). def calcular_sharpe
+
+Método de seleção: O método de seleção utilizado no algoritmo é a seleção por torneio. Neste método, um número fixo de indivíduos (portfólios) é escolhido aleatoriamente da população, e o indivíduo com o melhor fitness (Sharpe Ratio) entre eles é selecionado para reprodução. Esse processo é repetido para gerar a nova população. def selecao_torneio
+
+Método de crossover: O método de crossover (cruzamento) implementado é o crossover de ponto único. Um ponto de corte aleatório é escolhido, e as frações do genoma de dois portfólios são trocadas a partir desse ponto para gerar dois novos portfólios. def cruzamento
+
+Método de inicialização: A inicialização do algoritmo é feita com uma população de portfólios, onde o primeiro portfólio é o genoma inicial fixo (um portfólio sugerido previamente), e os outros são gerados de forma aleatória usando a distribuição de Dirichlet, que garante que as frações somam 1.0 (100%). def gerar_portfolios_com_genoma_inicial
+
+O critério de parada: é o número fixo de gerações. O algoritmo é configurado para rodar por um número determinado de gerações (por exemplo, 100 gerações), e o melhor portfólio ao final dessas gerações é considerado a solução. def algoritmo_genetico_com_genoma_inicial
+
+### Aplicando as validações no Crossover de Um Ponto:
+
+  Restringir as alocações para um máximo de 20% em cada ativo
+
+  Normalizar e garantir portfólios de 100% após crossover e mutação
+
+  Aplicar penalidade no fitness
+
+  Aplicar o elitismo
