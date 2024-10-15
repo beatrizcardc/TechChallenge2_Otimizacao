@@ -38,6 +38,12 @@ import matplotlib.pyplot as plt
 
 # Título da aplicação
 st.title("Otimização de Investimentos - Realize seus Objetivos")
+# Caixas de texto explicativas
+st.write("### Conceitos Importantes")
+st.write("**Mutação**: A mutação é uma forma de introduzir variações em uma população de soluções.")
+st.write("**Elitismo**: O elitismo preserva as melhores soluções encontradas em uma geração.")
+st.write("**Sharpe Ratio**: Uma medida que compara o retorno de um investimento com seu risco.")
+
 
 # Entrada do usuário: valor total do investimento
 valor_total = st.number_input("Digite o valor total do investimento", value=100000)
