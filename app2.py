@@ -233,13 +233,16 @@ def cruzamento(pai1, pai2):
 
     return filho1, filho2
 
-# Função de mutação ajustada
-def mutacao(portfolio, taxa_mutacao, limite_max=0.25):
-    if np.random.random() < taxa_mutacao:
-        i = np.random.randint(0, len(portfolio))
-        portfolio[i] += np.random.uniform(-0.1, 0.1)
-        portfolio = ajustar_alocacao(portfolio, limite_max)
-    return portfolio
+# Função para gerar o genoma inicial de portfólios com 34 ativos
+genoma_inicial = np.array([
+    0.00, 0.00, 0.20, 0.00, 0.05, 0.00, 0.03, 0.00, 0.00, 0.03,
+    0.05, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.05, 0.05, 0.06,
+    0.10, 0.00, 0.00, 0.00, 0.05, 0.05, 0.05, 0.05, 0.00, 0.05,
+    0.05, 0.03, 0.05, 0.00
+])
+
+# Verificando se a soma das alocações é 100%
+assert np.isclose(genoma_inicial.sum(), 1.0), "As alocações devem somar 100% (ou 1.0 em fração)"
 
 # Rodar o algoritmo genético com o genoma inicial fixo
 melhor_portfolio = algoritmo_genetico_com_genoma_inicial(
@@ -284,6 +287,7 @@ retorno_36m = np.dot(melhor_portfolio, retornos_36m)
 st.write(f"Retorno esperado em 12 meses: {retorno_12m:.2f}%")
 st.write(f"Retorno esperado em 24 meses: {retorno_24m:.2f}%")
 st.write(f"Retorno esperado em 36 meses: {retorno_36m:.2f}%")
+
 
 
 
