@@ -67,6 +67,9 @@ with st.sidebar:
     # Adicionar controle para selecionar qual tipo de retorno usar
     tipo_retorno = st.selectbox("Deseja usar retornos ajustados ou reais?", options=["Ajustados", "Reais"])
 
+    # Oferecer a opção para o usuário definir metas de retorno personalizadas
+    personalizar_retorno = st.selectbox("Personalizar taxa de retorno?", options=["Não", "Sim"])
+
 # Carregar os dados do CSV atualizado diretamente do GitHub
 csv_url = 'https://raw.githubusercontent.com/beatrizcardc/TechChallenge2_Otimizacao/main/Pool_Investimentos.csv'
 try:
@@ -125,6 +128,18 @@ if tipo_retorno == "Ajustados":
 else:
     retornos_usados = retornos_reais
 
+# Definir as metas de retorno personalizadas se o usuário optar por personalizá-las
+if personalizar_retorno == "Sim":
+    taxa_retorno_12m = st.sidebar.number_input("Meta de retorno em 12 meses (%)", min_value=0.0, value=10.0)
+    taxa_retorno_24m = st.sidebar.number_input("Meta de retorno em 24 meses (%)", min_value=0.0, value=12.0)
+    taxa_retorno_36m = st.sidebar.number_input("Meta de retorno em 36 meses (%)", min_value=0.0, value=15.0)
+
+    metas_retorno = {
+        '12m': taxa_retorno_12m,
+        '24m': taxa_retorno_24m,
+        '36m': taxa_retorno_36m
+    }
+
 # Função para calcular o Sharpe Ratio com penalização e normalização
 def calcular_sharpe(portfolio, retornos, riscos, taxa_livre_risco):
     retorno_portfolio = np.dot(portfolio, retornos)  # Retorno ponderado
@@ -137,7 +152,73 @@ def calcular_sharpe(portfolio, retornos, riscos, taxa_livre_risco):
     # Calcular o Sharpe Ratio
     sharpe_ratio = (retorno_portfolio - taxa_livre_risco) / risco_portfolio
 
+    # Adicionar limites superiores e inferiores ao Sharpe Ratio para evitar valores irreais
+    if sharpe_ratio < 1.0:  # Penalizar Sharpe Ratios muito baixos
+        sharpe_ratio = sharpe_ratio * 0.8  # Penalidade adicional
+    elif sharpe_ratio > 3:  # Permitir mais exploração de ativos com Sharpe Ratio maior
+        sharpe_ratio = sharpe_ratio * 0.2  # Recompensa para maiores Sharpe Ratios
+
     return sharpe_ratio
+
+# Função para gerar o genoma inicial de portfólios com 34 ativos
+genoma_inicial = np.array([
+    0.00, 0.00, 0.20, 0.00, 0.05, 0.00, 0.03, 0.00, 0.00, 0.03,
+    0.05, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.05, 0.05, 0.06,
+    0.10, 0.00, 0.00, 0.00, 0.05, 0.05, 0.05, 0.05, 0.00, 0.05,
+    0.05, 0.03, 0.05, 0.00
+])
+
+# Verificando se a soma das alocações é 100%
+assert np.isclose(genoma_inicial.sum(), 1.0), "As alocações devem somar 100% (ou 1.0 em fração)"
+
+# Função de mutação ajustada
+def mutacao(portfolio, taxa_mutacao, limite_max=0.25):
+    if np.random.random() < taxa_mutacao:
+        i = np.random.randint(0, len(portfolio))
+        portfolio[i] += np.random.uniform(-0.1, 0.1)
+        portfolio = ajustar_alocacao(portfolio, limite_max)
+    return portfolio
+
+# Função para ajustar as alocações
+def ajustar_alocacao(portfolio, limite_max=0.25):
+    portfolio = np.clip(portfolio, 0, limite_max)  # Limitar entre 0 e 25%
+    portfolio /= portfolio.sum()  # Normalizar para garantir que a soma seja 1
+    return portfolio
+
+# Função de cruzamento ajustada
+def cruzamento(pai1, pai2):
+    num_pontos_corte = np.random.randint(1, 4)  # Gerar de 1 a 3 pontos de corte
+    pontos_corte = sorted(np.random.choice(range(1, len(pai1)), num_pontos_corte, replace=False))
+    filho1, filho2 = pai1.copy(), pai2.copy()
+
+    if len(pontos_corte) % 2 != 0:
+        pontos_corte.append(len(pai1))  # Garantir que temos pares de índices
+
+    for i in range(0, len(pontos_corte) - 1, 2):
+        filho1[pontos_corte[i]:pontos_corte[i+1]] = pai2[pontos_corte[i]:pontos_corte[i+1]]
+        filho2[pontos_corte[i]:pontos_corte[i+1]] = pai1[pontos_corte[i]:pontos_corte[i+1]]
+
+    # Ajustar e normalizar os filhos
+    filho1 = ajustar_alocacao(filho1) # Limitar a alocação por ativo e normalizar
+    filho2 = ajustar_alocacao(filho2) # Limitar a alocação por ativo e normalizar
+
+    return filho1, filho2
+
+# Função auxiliar para seleção por torneio
+def selecao_torneio(populacao, fitness_scores, tamanho_torneio=3):
+    selecionados = []
+    for _ in range(len(populacao)):
+        competidores = np.random.choice(len(populacao), tamanho_torneio, replace=False)
+        vencedor = competidores[np.argmax(fitness_scores[competidores])]
+        selecionados.append(populacao[vencedor])
+    return selecionados
+
+# Função para gerar a população inicial
+def gerar_portfolios_com_genoma_inicial(genoma_inicial, num_portfolios, num_ativos):
+    populacao = [genoma_inicial]  # Começar com o genoma inicial fixo
+    for _ in range(num_portfolios - 1):  # Gerar o restante aleatoriamente
+        populacao.append(np.random.dirichlet(np.ones(num_ativos)))
+    return populacao
 
 # Função para rodar o algoritmo genético com ajustes de penalidade e variabilidade
 def algoritmo_genetico_com_genoma_inicial(retornos, riscos, genoma_inicial, taxa_livre_risco=0.1075, num_portfolios=100, geracoes=100, usar_elitismo=True, taxa_mutacao=0.05):
@@ -186,58 +267,6 @@ def algoritmo_genetico_com_genoma_inicial(retornos, riscos, genoma_inicial, taxa
 
     return melhor_portfolio
 
-# Funções auxiliares: seleção por torneio
-def selecao_torneio(populacao, fitness_scores, tamanho_torneio=3):
-    selecionados = []
-    for _ in range(len(populacao)):
-        competidores = np.random.choice(len(populacao), tamanho_torneio, replace=False)
-        vencedor = competidores[np.argmax(fitness_scores[competidores])]
-        selecionados.append(populacao[vencedor])
-    return selecionados
-
-# Gerar a população inicial
-def gerar_portfolios_com_genoma_inicial(genoma_inicial, num_portfolios, num_ativos):
-    populacao = [genoma_inicial]  # Começar com o genoma inicial fixo
-    for _ in range(num_portfolios - 1):  # Gerar o restante aleatoriamente
-        populacao.append(np.random.dirichlet(np.ones(num_ativos)))
-    return populacao
-
-# Ajustar os limites de alocação para permitir uma maior concentração em ativos de alto retorno
-def ajustar_alocacao(portfolio, limite_max=0.25):
-    portfolio = np.clip(portfolio, 0, limite_max)  # Limitar entre 0 e 25%
-    portfolio /= portfolio.sum()  # Normalizar para garantir que a soma seja 1
-    return portfolio
-
-# Função de cruzamento ajustada
-def cruzamento(pai1, pai2):
-    num_pontos_corte = np.random.randint(1, 4)  # Gerar de 1 a 3 pontos de corte
-    pontos_corte = sorted(np.random.choice(range(1, len(pai1)), num_pontos_corte, replace=False))
-    filho1, filho2 = pai1.copy(), pai2.copy()
-
-    if len(pontos_corte) % 2 != 0:
-        pontos_corte.append(len(pai1))  # Garantir que temos pares de índices
-
-    for i in range(0, len(pontos_corte) - 1, 2):
-        filho1[pontos_corte[i]:pontos_corte[i+1]] = pai2[pontos_corte[i]:pontos_corte[i+1]]
-        filho2[pontos_corte[i]:pontos_corte[i+1]] = pai1[pontos_corte[i]:pontos_corte[i+1]]
-
-    # Ajustar e normalizar os filhos
-    filho1 = ajustar_alocacao(filho1) # Limitar a alocação por ativo e normalizar
-    filho2 = ajustar_alocacao(filho2) # Limitar a alocação por ativo e normalizar
-
-    return filho1, filho2
-
-# Função para gerar o genoma inicial de portfólios com 34 ativos
-genoma_inicial = np.array([
-    0.00, 0.00, 0.20, 0.00, 0.05, 0.00, 0.03, 0.00, 0.00, 0.03,
-    0.05, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.05, 0.05, 0.06,
-    0.10, 0.00, 0.00, 0.00, 0.05, 0.05, 0.05, 0.05, 0.00, 0.05,
-    0.05, 0.03, 0.05, 0.00
-])
-
-# Verificando se a soma das alocações é 100%
-assert np.isclose(genoma_inicial.sum(), 1.0), "As alocações devem somar 100% (ou 1.0 em fração)"
-
 # Rodar o algoritmo genético com o genoma inicial fixo
 melhor_portfolio = algoritmo_genetico_com_genoma_inicial(
     retornos_usados,  # Usar o conjunto de retornos selecionado pelo usuário
@@ -281,6 +310,7 @@ retorno_36m = np.dot(melhor_portfolio, retornos_36m)
 st.write(f"Retorno esperado em 12 meses: {retorno_12m:.2f}%")
 st.write(f"Retorno esperado em 24 meses: {retorno_24m:.2f}%")
 st.write(f"Retorno esperado em 36 meses: {retorno_36m:.2f}%")
+
 
 
 
