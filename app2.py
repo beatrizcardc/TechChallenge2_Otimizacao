@@ -1,4 +1,9 @@
 import streamlit as st  
+import pandas as pd
+import numpy as np
+import yfinance as yf
+import matplotlib.pyplot as plt
+
 # Customização de CSS para fundo verde escuro e letras brancas
 st.markdown(
     """
@@ -29,40 +34,38 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-
-import streamlit as st
-import pandas as pd
-import numpy as np
-import yfinance as yf
-import matplotlib.pyplot as plt
-
 # Título da aplicação
 st.title("Otimização de Investimentos - Realize seus Objetivos")
+
 # Caixas de texto explicativas
 st.write("### Conceitos Importantes")
 st.write("**Mutação**: A mutação é uma forma de introduzir variações em uma população de soluções.")
 st.write("**Elitismo**: O elitismo preserva as melhores soluções encontradas em uma geração.")
 st.write("**Sharpe Ratio**: Uma medida que compara o retorno de um investimento com seu risco.")
 
+# Jogando as opções de entrada para o menu lateral
+with st.sidebar:
+    # Entrada do usuário: valor total do investimento
+    valor_total = st.number_input("Digite o valor total do investimento", value=100000)
 
-# Entrada do usuário: valor total do investimento
-valor_total = st.number_input("Digite o valor total do investimento", value=100000)
+    # Adicionar controle para selecionar a taxa de mutação com explicação
+    taxa_mutacao = st.slider(
+        "Taxa de Mutação",  min_value=0.01, max_value=0.2, value=0.05, step=0.01, 
+        help="A taxa de mutação é um mecanismo essencial para garantir a exploração de novas soluções em algoritmos genéticos, ajudando a balancear exploração (testar soluções novas) e aproveitamento (melhorar soluções existentes)."
+    )
 
-# Adicionar controle para selecionar a taxa de mutação com explicação
-taxa_mutacao = st.slider(
-    "Taxa de Mutação",  min_value=0.01, max_value=0.2, value=0.05, step=0.01, 
-    help="A taxa de mutação é um mecanismo essencial para garantir a exploração de novas soluções em algoritmos genéticos, ajudando a balancear exploração (testar soluções novas) e aproveitamento (melhorar soluções existentes)."
-)
+    # Adicionar controle para selecionar a taxa livre de risco (exemplo: taxa SELIC)
+    taxa_livre_risco = st.number_input("Taxa Livre de Risco (Ex: SELIC, POUPANÇA)", value=0.1075,
+                                      help="Insira uma taxa que melhor de ajuste aos seus objetivos. A taxa livre de risco padrão no Brasil é a SELIC")
 
-# Adicionar controle para selecionar a taxa livre de risco (exemplo: taxa SELIC)
-taxa_livre_risco = st.number_input("Taxa Livre de Risco (Ex: SELIC, POUPANÇA)", value=0.1075,
-                                  help="Insira uma taxa que melhor de ajuste aos seus objetivos. A taxa livre de risco padrão no Brasil é a SELIC")
+    # Pergunta sobre o uso do elitismo (Sim ou Não)
+    usar_elitismo = st.selectbox("Deseja usar elitismo?", options=["Sim", "Não"])
 
-# Pergunta sobre o uso do elitismo (Sim ou Não)
-usar_elitismo = st.selectbox("Deseja usar elitismo?", options=["Sim", "Não"])
+    # Convertendo a resposta para um valor booleano
+    usar_elitismo = True if usar_elitismo == "Sim" else False
 
-# Convertendo a resposta para um valor booleano
-usar_elitismo = True if usar_elitismo == "Sim" else False
+    # Adicionar controle para selecionar qual tipo de retorno usar
+    tipo_retorno = st.selectbox("Deseja usar retornos ajustados ou reais?", options=["Ajustados", "Reais"])
 
 # Carregar os dados do CSV atualizado diretamente do GitHub
 csv_url = 'https://raw.githubusercontent.com/beatrizcardc/TechChallenge2_Otimizacao/main/Pool_Investimentos.csv'
@@ -115,9 +118,6 @@ retornos_reais = np.random.rand(34) * 0.4  # Retornos simulados entre 0% e 40%
 retornos_ajustados = retornos_reais.copy()
 retornos_ajustados[10:14] *= 1.2  # Aumentar em 20% os retornos das criptos
 retornos_ajustados[:10] *= 1.15   # Aumentar em 15% os retornos das ações
-
-# Adicionar controle para selecionar qual tipo de retorno usar
-tipo_retorno = st.selectbox("Deseja usar retornos ajustados ou reais?", options=["Ajustados", "Reais"])
 
 # Definir qual conjunto de retornos será utilizado com base na escolha do usuário
 if tipo_retorno == "Ajustados":
@@ -233,18 +233,6 @@ def cruzamento(pai1, pai2):
 
     return filho1, filho2
 
-# Função para gerar o genoma inicial de portfólios com 34 ativos
-genoma_inicial = np.array([
-    0.00, 0.00, 0.20, 0.00, 0.05, 0.00, 0.03, 0.00, 0.00, 0.03,
-    0.05, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.05, 0.05, 0.06,
-    0.10, 0.00, 0.00, 0.00, 0.05, 0.05, 0.05, 0.05, 0.00, 0.05,
-    0.05, 0.03, 0.05, 0.00
-])
-
-# Verificando se a soma das alocações é 100%
-assert np.isclose(genoma_inicial.sum(), 1.0), "As alocações devem somar 100% (ou 1.0 em fração)"
-
-
 # Função de mutação ajustada
 def mutacao(portfolio, taxa_mutacao, limite_max=0.25):
     if np.random.random() < taxa_mutacao:
@@ -297,98 +285,6 @@ st.write(f"Retorno esperado em 12 meses: {retorno_12m:.2f}%")
 st.write(f"Retorno esperado em 24 meses: {retorno_24m:.2f}%")
 st.write(f"Retorno esperado em 36 meses: {retorno_36m:.2f}%")
 
-
-#Inicio de nova opção no código
-
-# Definir a função verificar_retorno para comparar os retornos do portfólio com as metas definidas
-def verificar_retorno(portfolio, retornos_12m, retornos_24m, retornos_36m, metas_retorno):
-    """
-    Verifica se os retornos esperados do portfólio atendem às metas de retorno definidas pelo usuário.
-    
-    Args:
-        portfolio (np.array): Alocações do portfólio.
-        retornos_12m (np.array): Retornos esperados em 12 meses para cada ativo.
-        retornos_24m (np.array): Retornos esperados em 24 meses para cada ativo.
-        retornos_36m (np.array): Retornos esperados em 36 meses para cada ativo.
-        metas_retorno (dict): Metas de retorno para 12, 24 e 36 meses definidas pelo usuário.
-    
-    Returns:
-        bool: True se o portfólio atender às metas de retorno, False caso contrário.
-    """
-    # Calcular os retornos ponderados do portfólio para 12, 24 e 36 meses
-    retorno_portfolio_12m = np.dot(portfolio, retornos_12m)
-    retorno_portfolio_24m = np.dot(portfolio, retornos_24m)
-    retorno_portfolio_36m = np.dot(portfolio, retornos_36m)
-    
-    # Verificar se os retornos do portfólio atendem às metas
-    if (retorno_portfolio_12m >= metas_retorno['12m'] and
-        retorno_portfolio_24m >= metas_retorno['24m'] and
-        retorno_portfolio_36m >= metas_retorno['36m']):
-        return True
-    return False
-
-# Definir os parâmetros iniciais do algoritmo fora do if-else
-geracoes = 100  # Número de gerações
-num_portfolios = 100  # Número de portfólios
-
-# Oferecer a opção para o usuário definir metas de retorno personalizadas
-st.write("Deseja buscar um portfólio para atingir uma taxa de retorno personalizada?")
-personalizar_retorno = st.selectbox("Personalizar taxa de retorno?", options=["Não", "Sim"])
-
-# Se o usuário escolher 'Sim', permitir a entrada de metas de retorno para 12, 24 e 36 meses
-if personalizar_retorno == "Sim":
-    taxa_retorno_12m = st.number_input("Meta de retorno em 12 meses (%)", min_value=0.0, value=10.0)
-    taxa_retorno_24m = st.number_input("Meta de retorno em 24 meses (%)", min_value=0.0, value=12.0)
-    taxa_retorno_36m = st.number_input("Meta de retorno em 36 meses (%)", min_value=0.0, value=15.0)
-
-    # Definir as metas de retorno com base na entrada do usuário
-    metas_retorno = {
-        '12m': taxa_retorno_12m,
-        '24m': taxa_retorno_24m,
-        '36m': taxa_retorno_36m
-    }
-
-    # Executar a busca por um novo portfólio que atenda às metas
-    melhor_portfolio = None
-    for geracao in range(geracoes):
-        populacao = gerar_portfolios_com_genoma_inicial(genoma_inicial, num_portfolios, len(retornos_usados))
-        for portfolio in populacao:
-            if verificar_retorno(portfolio, retornos_12m, retornos_24m, retornos_36m, metas_retorno):
-                melhor_portfolio = portfolio
-                break
-        if melhor_portfolio is not None:  # Verificar se algum portfólio foi encontrado
-            break
-
-    # Caso o algoritmo encontre um portfólio que atenda às metas, exibir os resultados
-    if melhor_portfolio is not None:
-        distribuicao_investimento = melhor_portfolio * valor_total
-        distribuicao_df = pd.DataFrame({
-            'Ativo': ativos,
-            'Alocacao (%)': melhor_portfolio * 100,
-            'Valor Investido (R$)': distribuicao_investimento
-        })
-
-        st.write("Novo portfólio encontrado para atingir as metas de retorno:")
-        st.dataframe(distribuicao_df.style.format({'Alocacao (%)': '{:.2f}', 'Valor Investido (R$)': '{:.2f}'}))
-
-        retorno_12m = np.dot(melhor_portfolio, retornos_12m)
-        retorno_24m = np.dot(melhor_portfolio, retornos_24m)
-        retorno_36m = np.dot(melhor_portfolio, retornos_36m)
-
-        st.write(f"Novo retorno esperado em 12 meses: {retorno_12m:.2f}%")
-        st.write(f"Novo retorno esperado em 24 meses: {retorno_24m:.2f}%")
-        st.write(f"Novo retorno esperado em 36 meses: {retorno_36m:.2f}%")
-    else:
-        st.write("Não foi encontrado um portfólio que atenda às metas de retorno especificadas.")
-
-# Caso o usuário escolha "Não", manter o portfólio já gerado
-else:
-    st.write("Você optou por não personalizar as metas de retorno. Mantendo o portfólio atual.")
-    # Mostrar o portfólio já gerado, caso tenha sido criado anteriormente
-    if 'distribuicao_df' in locals():
-        st.dataframe(distribuicao_df.style.format({'Alocacao (%)': '{:.2f}', 'Valor Investido (R$)': '{:.2f}'}))
-    else:
-        st.write("Não há portfólio gerado para exibir.")
 
 
 
